@@ -1,5 +1,16 @@
 import { type JSX } from "react";
 import type { SignupFormData, SignupFormErrors } from "../types";
+import {
+  Button,
+  Card,
+  Field,
+  Input,
+  Stack,
+  Text,
+  Heading,
+  Box,
+} from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 interface SignupFormProps {
   formData: SignupFormData; // this is the actual values the user is inputting
@@ -16,64 +27,112 @@ const SignupForm = ({
   onBlur,
   onSubmit,
 }: SignupFormProps): JSX.Element => {
-
   return (
-    <form onSubmit={onSubmit}>
-      <h2>Join the Fridgy Fam!</h2>
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minH="50vh"
+      p={4}
+    >
+      <form onSubmit={onSubmit}>
+        <Card.Root maxW="sm" w="full" p={6}>
+          <Card.Header>
+            <Heading size="md">Join the Fridgy fam!</Heading>
+            <Text fontSize="sm" color="gray.500">
+              Sign up with your email and password below
+            </Text>
+          </Card.Header>
 
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          value={formData.username}
-          onChange={onInputChange}
-          onBlur={onBlur}
-        />
-        {errors.username && <p>{errors.username}</p>}
-      </div>
+          <Card.Body>
+            <Stack gap={4}>
+              <Field.Root>
+                <Field.Label>Email</Field.Label>
+                <Input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={onInputChange}
+                  onBlur={onBlur}
+                  required
+                />
+                {errors.email && (
+                  <Text color="red.500" fontSize="sm">
+                    {errors.email}
+                  </Text>
+                )}
+              </Field.Root>
 
-      <div>
-        <label htmlFor="email">Email</label>
-        <input
-          type="text"
-          name="email"
-          id="email"
-          value={formData.email}
-          onChange={onInputChange}
-          onBlur={onBlur}
-        />
-        {errors.email && <p>{errors.email}</p>}
-      </div>
+              <Field.Root>
+                <Field.Label>Password</Field.Label>
+                <Input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={onInputChange}
+                  onBlur={onBlur}
+                  required
+                />
 
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          value={formData.password}
-          onChange={onInputChange}
-          onBlur={onBlur}
-        />
-        {errors.password && <p>{errors.password}</p>}
-      </div>
+                {errors.password && (
+                  <Text color="red.500" fontSize="sm">
+                    {errors.password}
+                  </Text>
+                )}
+              </Field.Root>
 
-      <div>
-        <input
-          type="checkbox"
-          name="agreeToTerms"
-          id="agreeToTerms"
-          checked={formData.agreeToTerms || false}
-          onChange={onInputChange}
-        />
-        <label htmlFor="agreeToTerms">Agree to the terms and conditions</label>
-        {errors.agreeToTerms && <p>{errors.agreeToTerms}</p>}
-      </div>
+              <div>
+                <input
+                  type="checkbox"
+                  name="agreeToTerms"
+                  id="agreeToTerms"
+                  checked={formData.agreeToTerms || false}
+                  onChange={onInputChange}
+                  onBlur={onBlur}
+                />
+                <label htmlFor="agreeToTerms">
+                  Agree to the terms and conditions
+                </label>
+                {errors.agreeToTerms && <p>{errors.agreeToTerms}</p>}
+              </div>
 
-      <button type="submit">Submit</button>
-    </form>
+              {/* <Field.Root>
+                <Flex align="center" gap={2}>
+                  <Checkbox.Root
+                    id="agreeToTerms"
+                    name="agreeToTerms"
+                    isChecked={formData.agreeToTerms || false}
+                    // value={formData.agreeToTerms || false}
+                    onChange={onInputChange} // this line of code is erroring, not sure if it should be value...
+                  />
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+                </Flex>
+
+                {errors.agreeToTerms && (
+                  <Text color="red.500" fontSize="sm" mt={1}>
+                    {errors.agreeToTerms}
+                  </Text>
+                )}
+              </Field.Root> */}
+            </Stack>
+          </Card.Body>
+
+          <Card.Footer flexDirection="column" alignItems="flex-start" gap={3}>
+            <Button type="submit" variant="solid" colorScheme="blue" w="full">
+              Submit
+            </Button>
+            <Text fontSize="sm">
+              Already have an account?{" "}
+              <Link to="/login" style={{ color: "#3182ce" }}>
+                Login
+              </Link>
+            </Text>
+          </Card.Footer>
+        </Card.Root>
+      </form>
+    </Box>
   );
 };
 

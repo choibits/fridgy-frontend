@@ -3,7 +3,8 @@ import { AuthContext } from "../context/AuthContext";
 import SignupForm from "../components/SignupForm";
 import type { SignupFormData, SignupFormErrors } from "../types";
 import { getAllUsers, findUserByEmail } from "../data/data";
-import {NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { Flex, Heading } from "@chakra-ui/react";
 
 const Signup = (): JSX.Element => {
   // ==== CONTEXT ====
@@ -11,7 +12,6 @@ const Signup = (): JSX.Element => {
 
   // ==== STATE ====
   const [formData, setFormData] = useState<SignupFormData>({
-    username: "",
     email: "",
     password: "",
     agreeToTerms: false,
@@ -30,11 +30,7 @@ const Signup = (): JSX.Element => {
   const validateField = (name: string, value: string | boolean): string => {
     let error = "";
 
-    if (name === "username" && typeof value === "string") {
-      if (!value.trim()) error = "Username is required.";
-      else if (value.trim().length < 5)
-        error = "Username must be at least 5 characters.";
-    } else if (name === "email" && typeof value === "string") {
+    if (name === "email" && typeof value === "string") {
       if (!value.trim()) error = "Email is required.";
       else if (!/\S+@\S+\.\S+/.test(value))
         error = "Email must be valid (contain @ and .)";
@@ -68,7 +64,6 @@ const Signup = (): JSX.Element => {
     e.preventDefault();
 
     const newErrors: SignupFormErrors = {
-      username: "",
       email: "",
       password: "",
       agreeToTerms: "",
@@ -93,10 +88,9 @@ const Signup = (): JSX.Element => {
     // signup comes from AuthContext
     if (isValid) {
       signup({
-        username: formData.username,
         email: formData.email,
         password: formData.password,
-        agreeToTerms: formData.agreeToTerms
+        agreeToTerms: formData.agreeToTerms,
       });
 
       // check if user was added to db
@@ -107,7 +101,6 @@ const Signup = (): JSX.Element => {
         setSignupSuccess(true);
         // reset form
         setFormData({
-          username: "",
           email: "",
           password: "",
           agreeToTerms: false,
@@ -118,21 +111,30 @@ const Signup = (): JSX.Element => {
 
   return (
     <>
-      <h1>Signup</h1>
-      <SignupForm
-        formData={formData}
-        errors={errors}
-        onInputChange={handleInputChange}
-        onSubmit={handleSubmit}
-        onBlur={handleBlur}
-      />
+      <Flex
+        as="main"
+        direction="column"
+        align="center"
+        minH="100vh"
+        p={8}
+        textAlign="center"
+      >
+        <Heading size="2xl">Sign up</Heading>
+        <SignupForm
+          formData={formData}
+          errors={errors}
+          onInputChange={handleInputChange}
+          onSubmit={handleSubmit}
+          onBlur={handleBlur}
+        />
 
-      {signupSuccess && (
-        <p>
-          Account successfully created!
-          <NavLink to="/login">Login now</NavLink>
-        </p>
-      )}
+        {signupSuccess && (
+          <p>
+            Account successfully created!
+            <NavLink to="/login">Login now</NavLink>
+          </p>
+        )}
+      </Flex>
     </>
   );
 };

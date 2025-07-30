@@ -14,7 +14,7 @@ const Landing = (): JSX.Element => {
     >
       <header>
         <Heading size="5xl">Fridgy</Heading>
-        <Heading size="2xl">Never forget what's in your fridge!</Heading>
+        <Heading size="2xl">Never forget what's in your fridge</Heading>
       </header>
 
       <section>

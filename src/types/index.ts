@@ -3,7 +3,6 @@
 // ==== USER TYPES ====
 export interface User {
   id?: number;
-  username: string;
   email: string;
   password: string;
   agreeToTerms: boolean;
@@ -12,14 +11,12 @@ export interface User {
 // ==== SIGNUP FORM TYPES ====
 export interface SignupFormData {
   email: string;
-  username: string;
   password: string;
   agreeToTerms: boolean;
 }
 
 export type SignupFormErrors = {
   email?: string;
-  username?: string;
   password?: string;
   agreeToTerms?: string;
 };

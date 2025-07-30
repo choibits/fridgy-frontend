@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { type JSX } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { LoginFormData } from "../types/index";
 import { AuthContext } from "../context/AuthContext";
 import {
@@ -91,7 +91,6 @@ const Login = (): JSX.Element => {
       justifyContent="center"
       alignItems="center"
       minH="100vh"
-      bg="gray.50"
       p={4}
     >
       <form onSubmit={handleSubmit} autoComplete="off">
@@ -141,10 +140,10 @@ const Login = (): JSX.Element => {
             </Button>
 
             <Text fontSize="sm">
-              Don&apos;t have an account?{" "}
-              <NavLink to="/signup" style={{ color: "#3182ce" }}>
-                Register
-              </NavLink>
+              Don't have an account? Register{" "}
+              <Link to="/signup" style={{ color: "#3182ce" }}>
+                here
+              </Link>
             </Text>
           </Card.Footer>
         </Card.Root>
