@@ -94,7 +94,6 @@ const Login2 = (): JSX.Element => {
           display="flex"
           justifyContent="center"
           alignSelf="center"
-          minH="100vh"
           p={4}
         >
           <form onSubmit={handleSubmit} autoComplete="off">
