@@ -1,9 +1,11 @@
 import Navbar from "./components/navbar/Navbar";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import GroceryList from "./pages/GroceryList";
-import Refrigerator from "./pages/Refrigerator";
-import Food from "./pages/Food";
+import GroceryLists from "./pages/GroceryLists";
+import Refrigerators from "./pages/Refrigerators";
+import GroceryListDetails from "./pages/GroceryListDetails";
+import RefrigeratorDetails from "./pages/RefrigeratorDetails";
+import ItemDetails from "./pages/ItemDetails";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login2 from "./pages/Login";
@@ -24,10 +26,13 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login2 />} />
         <Route path="/home" element={<Home />} />
-        {/* <Route path="/addgrocerylist" element={<AddGroceryList />} /> */}
-        <Route path="/grocerylist/id:" element={<GroceryList />} />
-        <Route path="/refrigerator/:id" element={<Refrigerator />} />
-        <Route path="/refrigerator/:id/food/:id" element={<Food />} />
+        <Route path="/grocerylists" element={<GroceryLists />} />
+        <Route path="/refrigerators" element={<Refrigerators />} />
+        <Route path="/grocerylist/id:" element={<GroceryListDetails />} />
+        <Route path="/refrigerator/:id" element={<RefrigeratorDetails />} />
+
+        {/* TODO: Not sure about this path? */}
+        <Route path="/refrigerator/:id/food/:id" element={<ItemDetails />} />
       </Routes>
       <Footer />
     </div>

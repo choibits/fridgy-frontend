@@ -15,11 +15,13 @@ const Home = (): JSX.Element => {
       >
         <Heading size="2xl">Fridgy Home</Heading>
         <br></br>
-        <Link to="/addgrocerylist">
+        <Link to="/grocerylists">
           <Button>My Grocery Lists</Button>
         </Link>
         <br></br>
-        <Button>My Refrgerators</Button>
+        <Link to="/refrigerators">
+          <Button>My Refrgerators</Button>
+        </Link>
       </Flex>
     </>
   );
