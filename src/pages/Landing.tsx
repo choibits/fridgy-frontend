@@ -1,5 +1,6 @@
 import { type JSX } from "react";
 import { Button, Heading, Flex, Box, Spacer, Text } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const Landing = (): JSX.Element => {
   return (
@@ -36,9 +37,9 @@ const Landing = (): JSX.Element => {
           </Box>
         </Flex>
 
-        <a href="/signup">
+        <Link to="/signup">
           <Button>Join now</Button>
-        </a>
+        </Link>
       </section>
     </Flex>
   );
