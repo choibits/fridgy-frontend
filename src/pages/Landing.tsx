@@ -1,26 +1,46 @@
 import { type JSX } from "react";
+import { Button, Heading, Flex, Box, Spacer, Text } from "@chakra-ui/react";
 
 const Landing = (): JSX.Element => {
   return (
-    <main>
-      <h1>Make the most of your food!</h1>
+    <Flex
+      as="main"
+      direction="column"
+      align="center"
+      minH="100vh"
+      p={8}
+      textAlign="center"
+    >
+      <header>
+        <Heading size="5xl">Fridgy</Heading>
+        <Heading size="2xl">Never forget what's in your fridge!</Heading>
+      </header>
 
       <section>
-        A brief, one-or-two-sentence description of the problem your app solves
-        or the value it provides.
-        <br></br>A primary call-to-action (CTA) button (e.g., “Get Started” or
-        “Sign Up Now”).<br></br>
+        <Heading size="xl">Why choose Fridgy?</Heading>
+        <Flex gap="4" direction="column">
+          <Box bg="gray.100" width="30" height="30" padding="5" margin="5">
+            <Text>Easily manage multiple grocery lists and fridges</Text>
+          </Box>
+
+          <Spacer />
+
+          <Box bg="gray.100" width="30" height="30" padding="5" margin="5">
+            <Text>Track item expiration dates</Text>
+          </Box>
+
+          <Spacer />
+
+          <Box bg="gray.100" width="30" height="30" padding="5" margin="5">
+            <Text>Reduce grocery spending and food waste</Text>
+          </Box>
+        </Flex>
+
         <a href="/signup">
-          <button>Join now</button>
+          <Button>Join now</Button>
         </a>
       </section>
-      <section>
-        3. Features Section A section that highlights the key features and
-        benefits of your application. Use a combination of icons, images, and
-        short descriptions to make this section visually appealing and easy to
-        understand.
-      </section>
-    </main>
+    </Flex>
   );
 };
 

@@ -19,8 +19,8 @@ const App = () => {
       {/* {isLoggedIn && <Navbar />} */}
       <Navbar />
       <Routes>
-        <Route path="/about" element={<About />} />
         <Route path="/" element={<Landing />} />
+        <Route path="/about" element={<About />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
