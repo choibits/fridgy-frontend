@@ -37,6 +37,8 @@ const Signup = (): JSX.Element => {
 
   const [signupSuccess, setSignupSuccess] = useState(false);
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const { email, password } = formData;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,8 +100,9 @@ const Signup = (): JSX.Element => {
       const error = validateField(typedName, formData[typedName]);
       fieldErrors[typedName] = error;
     }
-
+    setIsLoading(true);
     await signup();
+    setIsLoading(false);
   };
 
   const signup = async () => {
@@ -207,6 +210,7 @@ const Signup = (): JSX.Element => {
                   variant="solid"
                   colorScheme="blue"
                   w="full"
+                  disabled={isLoading}
                 >
                   Submit
                 </Button>

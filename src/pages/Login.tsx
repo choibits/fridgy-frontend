@@ -28,6 +28,8 @@ const Login2 = (): JSX.Element => {
 
   const { email, password } = formData;
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +49,9 @@ const Login2 = (): JSX.Element => {
       return;
     }
 
+    setIsLoading(true);
     await login();
+    setIsLoading(false);
     navigate("/home");
   };
 
@@ -90,12 +94,7 @@ const Login2 = (): JSX.Element => {
         textAlign="center"
       >
         <Heading size="2xl">Log in</Heading>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignSelf="center"
-          p={4}
-        >
+        <Box display="flex" justifyContent="center" alignSelf="center" p={4}>
           <form onSubmit={handleSubmit} autoComplete="off">
             <Card.Root maxW="sm" w="full" p={6}>
               <Card.Header>
@@ -147,6 +146,7 @@ const Login2 = (): JSX.Element => {
                   variant="solid"
                   colorScheme="blue"
                   w="full"
+                  disabled={isLoading}
                 >
                   Login
                 </Button>
@@ -161,7 +161,7 @@ const Login2 = (): JSX.Element => {
             </Card.Root>
           </form>
         </Box>
-        
+
         {error && (
           <Text color="red.500" fontSize="sm">
             {error}

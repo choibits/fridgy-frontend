@@ -1,11 +1,5 @@
 import { type JSX } from "react";
-import {
-  Stack,
-  Heading,
-  Box,
-  Flex,
-  Link,
-} from "@chakra-ui/react";
+import { Stack, Heading, Box, Flex, Link } from "@chakra-ui/react";
 
 const GroceryLists = (): JSX.Element => {
   return (
@@ -29,8 +23,8 @@ const GroceryLists = (): JSX.Element => {
           borderWidth="1px"
         >
           <Stack>
-            <Link variant="underline" to="">
-              Refrigerator 1
+            <Link variant="underline" to="/grocerylists/1">
+              Grocery List 1
             </Link>
           </Stack>
         </Box>
