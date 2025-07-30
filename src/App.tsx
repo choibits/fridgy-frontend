@@ -9,10 +9,10 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import About from "./pages/About";
 import Footer from "./components/footer/Footer";
-import AddGroceryList from "./pages/AddGroceryList";
+// import AddGroceryList from "./pages/AddGroceryList";
 // import { useAuth } from "./context/AuthContext"; // or however you're tracking auth
 
-
+// TODO: clean up code
 const App = () => {
   return (
     <div>
@@ -24,7 +24,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/addgrocerylist" element={<AddGroceryList />} />
+        {/* <Route path="/addgrocerylist" element={<AddGroceryList />} /> */}
         <Route path="/grocerylist/id:" element={<GroceryList />} />
         <Route path="/refrigerator/:id" element={<Refrigerator />} />
         <Route path="/refrigerator/:id/food/:id" element={<Food />} />
