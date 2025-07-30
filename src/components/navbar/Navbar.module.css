@@ -1,0 +1,47 @@
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 20px;
+  border: 2px solid #ff00bb;
+  position: relative;
+  top: 0;
+}
+
+.light {
+  background-color: #eae5e5;
+  color: #000000;
+}
+
+.dark {
+  background-color: #423a45;
+  color: white;
+}
+
+
+.linkList {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navLink {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: color 0.2s ease-in-out;
+}
+
+.navLink:hover {
+  background-color: #eab0db;
+  border: 2px solid #ff00bb;
+}
+
+.active {
+  color: #ff00bb;
+}
