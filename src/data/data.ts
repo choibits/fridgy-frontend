@@ -4,7 +4,6 @@ import type { GroceryList } from "../types/index";
 const users: User[] = [
   {
     id: 1,
-    username: "testuser",
     email: "test@example.com",
     password: "Password123",
     agreeToTerms: true,

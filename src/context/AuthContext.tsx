@@ -1,18 +1,15 @@
 import { createContext, useState } from "react";
-import type { User } from "../types/index";
+import type { User, SignupFormData } from "../types/index";
 
-// for the "Mock" API call
-import { addUser, findUser } from "../data/data";
-
-// 1. Create a type for the data you want to share (users)
+// 1. Create a type for the data you want to share
 interface AuthContextType {
   user: User | null; // Current user (or null if logged out)
 
   // Function that takes email/password, returns a Promise
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<void>;
 
   // Function that takes user details
-  signup: (userData: User) => void;
+  signup: (signupFormData: SignupFormData) => Promise<void>;
 
   // Simple function that doesn't return anything - later we will set user to null when called
   logout: () => void;
@@ -24,12 +21,14 @@ interface AuthContextType {
 // 2. Create an "Empty Context Box" with fallbacks / defaults
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  login: async () => false,
-  signup: () => {
-    console.log("Fallback signup (no provider set)");
+  login: async () => {
+    console.log("Fallback login function called (no provider set)");
+  },
+  signup: async () => {
+    console.log("Fallback signup function called (no provider set)");
   },
   logout: () => {
-    console.log("Fallback logout (no provider set)");
+    console.log("Fallback logout function called (no provider set)");
   },
   isLoggedIn: false,
 });
@@ -41,38 +40,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // This is the state to keep track of the logged in user - starts as null
   const [user, setUser] = useState<User | null>(null);
 
-  const signup = async (userData: User) => {
-    //  TODO: this would make a POST request to the backend -
-    // await fetch("/api/signup", { method: "POST", body: JSON.stringify({ ... }) });
-    const newUser: User = {
-      id: Math.floor(Math.random() * 1000),
-      ...userData,
-    };
-    addUser(newUser); // Save to my MOCK database
-    setUser(newUser); // Save to state
-  };
+  const signup = async (signupFormData: SignupFormData) => {
+    try {
+      const response = await fetch("http://localhost:8080/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signupFormData),
+      });
 
-  // TODO: send a fetch GET login request to your server - Then update state with the response if it’s successful (i.e. if 200 ok?)
-  const login = async (email: string, password: string) => {
-    const existingUser = await findUser(email, password); // check MOCK database
-    if (existingUser) {
-      setUser(existingUser);
-      return true;
-    } else {
-      console.log("Login failed: user not found");
-      return false;
+      if (!response.ok) throw new Error("Signup failed");
+
+      const userData = await response.json();
+      localStorage.setItem("token", userData.token);
+      setUser(userData);
+    } catch (error) {
+      console.error("Signup error:", error);
+      if (error instanceof Error) {
+        console.log("Signup failed. Please try again." + error.message);
+        // setError("Sign up failed. Please try again." + error.message); // TODO: create error state to hold this? Not sure if doing that in the AuthContext will cause it to break
+      } else {
+        console.log("Error is not an instance of Error. Signup failed. Please try again.");
+        // setError("Sign up failed. Please try again.");
+      }
     }
   };
 
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) throw new Error("Login failed");
+
+      const userData = await response.json(); // { token, user }
+      localStorage.setItem("token", userData.token); // Save the token
+
+      setUser(userData); // Save user to state
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error instanceof Error) {
+        console.log("Login failed. Please try again." + error.message);
+      } else {
+        console.log("Error is not an instance of Error. Login failed. Please try again.")
+      }
+    }
+  };
 
   // Logout function
   const logout = () => {
+    localStorage.removeItem("token"); // Remove token from localStorage
     setUser(null);
     console.log("User logged out");
     // set isLogged in to false
   };
 
   // Wraps whatever child components were passed in (children) inside an AuthContext.Provider - so you don't have to keep providing the values again and again and manually pass to every component that needs it.
+
+  //for !!user This turns the user (object or null) into a boolean: if user is truthy then true, iff null then false
   return (
     <AuthContext.Provider
       value={{ user, login, signup, logout, isLoggedIn: !!user }}
