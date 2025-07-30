@@ -23,7 +23,6 @@ interface SignupFormErrors {
 }
 
 const Signup = (): JSX.Element => {
-
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -40,9 +39,13 @@ const Signup = (): JSX.Element => {
 
   const { email, password } = formData;
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    // Clear feedback on new input
+    if (error) setError("");
+    if (signupSuccess) setSignupSuccess(false);
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -94,10 +97,6 @@ const Signup = (): JSX.Element => {
       const typedName = name as keyof SignupFormErrors;
       const error = validateField(typedName, formData[typedName]);
       fieldErrors[typedName] = error;
-    }
-
-    if (fieldErrors.email || fieldErrors.password) {
-      return;
     }
 
     await signup();

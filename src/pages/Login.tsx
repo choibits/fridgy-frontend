@@ -46,7 +46,7 @@ const Login2 = (): JSX.Element => {
       setError("Email and password are required.");
       return;
     }
-    
+
     await login();
     navigate("/home");
   };
@@ -162,6 +162,12 @@ const Login2 = (): JSX.Element => {
             </Card.Root>
           </form>
         </Box>
+        
+        {error && (
+          <Text color="red.500" fontSize="sm">
+            {error}
+          </Text>
+        )}
       </Flex>
     </>
   );
