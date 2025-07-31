@@ -19,27 +19,39 @@ const Landing = (): JSX.Element => {
 
       <section>
         <Heading size="xl">Why choose Fridgy?</Heading>
-        <Flex gap="4" direction="column">
+        <Flex direction="column" padding="5">
           <Box bg="gray.100" width="30" height="30" padding="5" margin="5">
             <Text>Easily manage multiple grocery lists and fridges</Text>
           </Box>
 
-          <Spacer />
-
+          <br></br>
           <Box bg="gray.100" width="30" height="30" padding="5" margin="5">
             <Text>Track item expiration dates</Text>
           </Box>
-
-          <Spacer />
+          <br></br>
 
           <Box bg="gray.100" width="30" height="30" padding="5" margin="5">
             <Text>Reduce grocery spending and food waste</Text>
           </Box>
         </Flex>
-
+        <br></br>
         <Link to="/signup">
           <Button>Join now</Button>
         </Link>
+
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignSelf="center"
+          p={4}
+        >
+          <Text fontSize="sm">
+            Already have an account? Login{" "}
+            <Link to="/login" style={{ color: "#3182ce" }}>
+              here
+            </Link>
+          </Text>
+        </Box>
       </section>
     </Flex>
   );

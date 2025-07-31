@@ -75,7 +75,7 @@ const Login = (): JSX.Element => {
         } else {
           setError("Login call failed. Please try again.");
         }
-        throw new Error("Login call failed");
+        return;
       }
 
       console.log(data);
@@ -155,7 +155,7 @@ const Login = (): JSX.Element => {
                 >
                   Login
                 </Button>
-
+                
                 <Text fontSize="sm">
                   Don't have an account? Register{" "}
                   <Link to="/signup" style={{ color: "#3182ce" }}>
