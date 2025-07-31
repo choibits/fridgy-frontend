@@ -10,6 +10,7 @@ import {
   Field,
   Input,
   Button,
+  Table,
 } from "@chakra-ui/react";
 import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../config";
@@ -124,6 +125,24 @@ const GroceryLists = (): JSX.Element => {
     }
   };
 
+  const handleDeleteList = async (listId: number | undefined) => {
+    if (listId === undefined) return; // extra safety check
+    try {
+      const token = localStorage.getItem("token"); // Adjust based on where you store it
+      await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setGroceryLists((prevLists) =>
+        prevLists.filter((list) => list.id !== listId)
+      );
+    } catch (error) {
+      console.error("Failed to delete list", error);
+    }
+  };
+
   return (
     <>
       <Flex
@@ -139,21 +158,43 @@ const GroceryLists = (): JSX.Element => {
           display="flex"
           justifyContent="center"
           alignSelf="center"
-          minH="25vh"
           minW="50vw"
           p={4}
         >
-          <Stack gap={2}>
-            {groceryLists.map((list) => (
-              <Link
-                key={list.id}
-                variant="underline"
-                href={`/grocerylists/${list.id}`}
-              >
-                {list.listName}
-              </Link>
-            ))}
-          </Stack>
+
+          <Table.Root size="sm" interactive>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader>List name</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">Actions</Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+
+            <Table.Body>
+              {groceryLists.map((list) => (
+                <Table.Row key={list.id}>
+                  <Table.Cell>
+                    <Link
+                      href={`/grocerylists/${list.id}`}
+                      color="blue.500"
+                      variant="underline"
+                    >
+                      {list.listName}
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell textAlign="end">
+                    <Button
+                      colorScheme="red"
+                      size="sm"
+                      onClick={() => handleDeleteList(list.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Root>
         </Box>
 
         <Box
