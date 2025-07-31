@@ -40,13 +40,17 @@ export interface LoginFormData {
   password: string;
 }
 
-// ==== GROCERY LIST TYPES ====
+// ==== TYPES ====
 export interface GroceryList {
   id?: number;
   listName: string;
 }
 
-// ==== ITEM TYPES ====
+export interface Refrigerator {
+  id?: number;
+  fridgeName: string;
+}
+
 export interface Item {
   id: number;
   name: string;
