@@ -125,7 +125,7 @@ const SignupForm = ({
             </Button>
             <Text fontSize="sm">
               Already have an account?{" "}
-              <Link to="/login" style={{ color: "#3182ce" }}>
+              <Link to="/auth/login" style={{ color: "#3182ce" }}>
                 Login
               </Link>
             </Text>

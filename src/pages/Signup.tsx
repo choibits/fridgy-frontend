@@ -11,6 +11,7 @@ import {
   Box,
   Flex,
 } from "@chakra-ui/react";
+import { API_BASE_URL } from "../config";
 
 interface FormData {
   email: string;
@@ -108,7 +109,7 @@ const Signup = (): JSX.Element => {
   const signup = async () => {
     console.log("signing up");
     try {
-      const response = await fetch("http://localhost:8080/auth/signup", {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -216,7 +217,7 @@ const Signup = (): JSX.Element => {
                 </Button>
                 <Text fontSize="sm">
                   Already have an account?{" "}
-                  <Link to="/login" style={{ color: "#3182ce" }}>
+                  <Link to="/auth/login" style={{ color: "#3182ce" }}>
                     Login
                   </Link>
                 </Text>
@@ -234,7 +235,7 @@ const Signup = (): JSX.Element => {
         {signupSuccess && (
           <Text mt={4} color="green.500">
             Account successfully created!{" "}
-            <Link to="/login" style={{ color: "#3182ce" }}>
+            <Link to="/auth/login" style={{ color: "#3182ce" }}>
               Login now
             </Link>
           </Text>

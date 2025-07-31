@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import type { JSX } from "react";
 import {
   Button,
@@ -13,6 +13,8 @@ import {
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import { saveAuthData } from "../utils/localStorageUtil.ts";
+import { AuthContext } from "../context/AuthContext";
+import { API_BASE_URL } from "../config";
 
 interface FormData {
   email: string;
@@ -20,6 +22,9 @@ interface FormData {
 }
 
 const Login = (): JSX.Element => {
+  // using the global context
+  const { setIsAuthenticated, setAuthData } = useContext(AuthContext);
+
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -59,7 +64,7 @@ const Login = (): JSX.Element => {
     console.log("logging in");
 
     try {
-      const response = await fetch("http://localhost:8080/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,6 +85,8 @@ const Login = (): JSX.Element => {
 
       console.log(data);
       saveAuthData(data);
+      setIsAuthenticated(true);
+      setAuthData(data);
       navigate("/home");
     } catch (error) {
       console.error("Login error:", error);
@@ -137,7 +144,6 @@ const Login = (): JSX.Element => {
                       required
                     />
                   </Field.Root>
-
                 </Stack>
               </Card.Body>
 
@@ -155,10 +161,10 @@ const Login = (): JSX.Element => {
                 >
                   Login
                 </Button>
-                
+
                 <Text fontSize="sm">
                   Don't have an account? Register{" "}
-                  <Link to="/signup" style={{ color: "#3182ce" }}>
+                  <Link to="/auth/signup" style={{ color: "#3182ce" }}>
                     here
                   </Link>
                 </Text>

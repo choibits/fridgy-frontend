@@ -1,5 +1,5 @@
 import Navbar from "./components/Navbar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import GroceryLists from "./pages/GroceryLists";
 import Refrigerators from "./pages/Refrigerators";
@@ -15,6 +15,7 @@ import { AuthContext } from "./context/AuthContext";
 import { useState, useEffect } from "react";
 import type { AuthResponse } from "./types";
 import { getAuthData } from "./utils/localStorageUtil";
+import {Text} from "@chakra-ui/react"
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -22,10 +23,48 @@ const App = () => {
   // Whever we go to any page we want to make sure the page is loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const localStorageData = getAuthData();
     console.log(localStorageData);
+
+    // if (localStorageData && localStorageData.token);
+    if (
+      localStorageData?.token &&
+      localStorageData?.id &&
+      localStorageData?.email
+    ) {
+      // nullish coalescing operator
+      setIsAuthenticated(true);
+      setAuthData(localStorageData);
+    }
+    setIsLoading(false);
   }, []);
+
+  // another use Effect for whenever the isLoading changes
+  useEffect(() => {
+    if (!isLoading) {
+      // need the is loading is false so that
+      const isAllowedPage =
+        location.pathname === "/auth/signup" ||
+        location.pathname === "/auth/login" ||
+        location.pathname === "/";
+
+      // user not authenticated and not on the auth page
+      // navigate away
+      console.log(`Globally allowed page: ${isAllowedPage}, User is authenticated: ${isAuthenticated}`);
+      if (!isAllowedPage && !isAuthenticated) {
+        navigate("/auth/login");
+      }
+      // if you have something in the useEffect it should be a dependency
+    }
+  }, [isLoading, isAuthenticated, location]);
+
+  if (isLoading) {
+    return<Text>isLoading...</Text>
+  }
 
   return (
     <>
@@ -41,9 +80,9 @@ const App = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/auth/signup" element={<Signup />} />
           <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/auth/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/grocerylists" element={<GroceryLists />} />
           <Route path="/refrigerators" element={<Refrigerators />} />

@@ -35,7 +35,7 @@ const Landing = (): JSX.Element => {
           </Box>
         </Flex>
         <br></br>
-        <Link to="/signup">
+        <Link to="/auth/signup">
           <Button>Join now</Button>
         </Link>
 
@@ -47,7 +47,7 @@ const Landing = (): JSX.Element => {
         >
           <Text fontSize="sm">
             Already have an account? Login{" "}
-            <Link to="/login" style={{ color: "#3182ce" }}>
+            <Link to="/auth/login" style={{ color: "#3182ce" }}>
               here
             </Link>
           </Text>

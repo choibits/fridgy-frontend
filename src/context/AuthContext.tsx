@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext} from "react";
 import type {AuthResponse} from "../types";
 
 // Create interface for data you want to share
