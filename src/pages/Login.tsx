@@ -12,13 +12,14 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
+import { saveAuthData } from "../utils/localStorageUtil.ts";
 
 interface FormData {
   email: string;
   password: string;
 }
 
-const Login2 = (): JSX.Element => {
+const Login = (): JSX.Element => {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -52,7 +53,6 @@ const Login2 = (): JSX.Element => {
     setIsLoading(true);
     await login();
     setIsLoading(false);
-    navigate("/home");
   };
 
   const login = async () => {
@@ -67,10 +67,20 @@ const Login2 = (): JSX.Element => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) throw new Error("Signup failed");
       const data = await response.json();
-      //   localStorage.setItem("token", data.token); //TODO: could set token here
+
+      if (!response.ok) {
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Login call failed. Please try again.");
+        }
+        throw new Error("Login call failed");
+      }
+
       console.log(data);
+      saveAuthData(data);
+      navigate("/home");
     } catch (error) {
       console.error("Login error:", error);
       if (error instanceof Error) {
@@ -78,7 +88,7 @@ const Login2 = (): JSX.Element => {
           "Login failed. Please try again. Error message: " + error.message
         );
       } else {
-        console.log(setError("Login failed. Please try again."));
+        console.log(setError("Login failed... Please try again."));
       }
     }
   };
@@ -128,11 +138,6 @@ const Login2 = (): JSX.Element => {
                     />
                   </Field.Root>
 
-                  {error && (
-                    <Text color="red.500" fontSize="sm">
-                      {error}
-                    </Text>
-                  )}
                 </Stack>
               </Card.Body>
 
@@ -172,4 +177,4 @@ const Login2 = (): JSX.Element => {
   );
 };
 
-export default Login2;
+export default Login;

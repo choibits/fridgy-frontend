@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null; // Current user (or null if logged out)
 
   // Function that takes email/password, returns a Promise
-  login: (email: string, password: string) => Promise<void>;
+  // login: (email: string, password: string) => Promise<void>;
 
   // Function that takes user details
   signup: (signupFormData: SignupFormData) => Promise<void>;
@@ -21,9 +21,9 @@ interface AuthContextType {
 // 2. Create an "Empty Context Box" with fallbacks / defaults
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  login: async () => {
-    console.log("Fallback login function called (no provider set)");
-  },
+  // login: async () => {
+  //   console.log("Fallback login function called (no provider set)");
+  // },
   signup: async () => {
     console.log("Fallback signup function called (no provider set)");
   },
@@ -53,7 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!response.ok) throw new Error("Signup failed");
 
       const userData = await response.json();
-      localStorage.setItem("token", userData.token);
       setUser(userData);
     } catch (error) {
       console.error("Signup error:", error);
@@ -67,35 +66,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      const response = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  // const login = async (email: string, password: string) => {
+  //   try {
+  //     const response = await fetch("http://localhost:8080/auth/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //     });
 
-      if (!response.ok) throw new Error("Login failed");
+  //     if (!response.ok) throw new Error("Login failed");
 
-      const userData = await response.json(); // { token, user }
-      localStorage.setItem("token", userData.token); // Save the token
+  //     const userData = await response.json(); 
 
-      setUser(userData); // Save user to state
-    } catch (error) {
-      console.error("Login error:", error);
-      if (error instanceof Error) {
-        console.log("Login failed. Please try again." + error.message);
-      } else {
-        console.log("Error is not an instance of Error. Login failed. Please try again.")
-      }
-    }
-  };
+  //     setUser(userData); // Save user to state
+  //   } catch (error) {
+  //     console.error("Login error:", error);
+  //     if (error instanceof Error) {
+  //       console.log("Login failed. Please try again." + error.message);
+  //     } else {
+  //       console.log("Error is not an instance of Error. Login failed. Please try again.")
+  //     }
+  //   }
+  // };
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem("token"); // Remove token from localStorage
     setUser(null);
     console.log("User logged out");
     // set isLogged in to false
@@ -106,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //for !!user This turns the user (object or null) into a boolean: if user is truthy then true, iff null then false
   return (
     <AuthContext.Provider
-      value={{ user, login, signup, logout, isLoggedIn: !!user }}
+      value={{ user, signup, logout, isLoggedIn: !!user }}
     >
       {children}
     </AuthContext.Provider>

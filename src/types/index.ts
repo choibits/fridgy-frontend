@@ -1,5 +1,18 @@
 // This is  where we export the interfaces that mocks the API response data (from springboot RESTful API built on Java or a public API)
 
+export interface AuthResponse {
+  sucess: boolean;
+  message: string;
+  id: number;
+  email: string;
+  token: string;
+};
+
+export interface LocalStorageStatus {
+  success: boolean;
+  message: string;
+}
+
 // ==== USER TYPES ====
 export interface User {
   id?: number;
