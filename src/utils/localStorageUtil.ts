@@ -25,16 +25,20 @@ export const saveAuthData = (authData: AuthResponse): LocalStorageStatus => {
 };
 
 export const getAuthData = (): AuthResponse | null => {
-    try {
-        const data = localStorage.getItem(AUTH_DATA_KEY);
-        // if data exists, parse JSON
-        return data ? JSON.parse(data) : null;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
+  try {
+    const data = localStorage.getItem(AUTH_DATA_KEY);
+    // if data exists, parse JSON
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
 
 export const removeAuthData = (): void => {
-
-} 
+  try {
+    localStorage.removeItem(AUTH_DATA_KEY);
+  } catch (error) {
+    console.log(error);
+  }
+};

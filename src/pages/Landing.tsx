@@ -1,5 +1,5 @@
 import { type JSX } from "react";
-import { Button, Heading, Flex, Box, Spacer, Text } from "@chakra-ui/react";
+import { Button, Heading, Flex, Box, Text } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 const Landing = (): JSX.Element => {

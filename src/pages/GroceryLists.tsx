@@ -59,7 +59,7 @@ const GroceryLists = (): JSX.Element => {
 
       const data = await response.json();
       if (!response.ok) {
-        setError("Call failed. Please try again.")
+        setError("Call failed. Please try again.");
         throw new Error("Create grocery list call failed");
       }
       console.log(data);
@@ -122,7 +122,6 @@ const GroceryLists = (): JSX.Element => {
           minH="25vh"
           minW="50vw"
           p={4}
-          borderWidth="1px"
         >
           <Stack>
             <Link variant="underline" to="/grocerylists/1">
@@ -138,7 +137,6 @@ const GroceryLists = (): JSX.Element => {
           minH="25vh"
           minW="50vw"
           p={4}
-          borderWidth="1px"
         >
           <form onSubmit={handleSubmit} autoComplete="off">
             <Card.Root maxW="sm" w="full" p={6}>
@@ -172,13 +170,7 @@ const GroceryLists = (): JSX.Element => {
                 alignItems="flex-start"
                 gap={3}
               >
-                <Button
-                  type="submit"
-                  variant="solid"
-                  colorScheme="blue"
-                  w="full"
-                  disabled={isLoading}
-                >
+                <Button type="submit" w="full" disabled={isLoading}>
                   Create List
                 </Button>
               </Card.Footer>
