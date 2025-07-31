@@ -93,7 +93,11 @@ const Refrigerators = (): JSX.Element => {
     }
   };
 
-  const handleDelete = async (fridgeId: number) => {
+  const handleDelete = async (fridgeId: number | undefined) => {
+    if (!fridgeId) {
+      setError("Refrigerator does not exist");
+      return;
+    }
     try {
       await fetch(`${API_BASE_URL}/refrigerators/${fridgeId}`, {
         method: "DELETE",

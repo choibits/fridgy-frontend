@@ -4,7 +4,6 @@ const GroceryList = (): JSX.Element => {
   return (
     <>
       <h1>Grocery List Name</h1>
-      {/* TODO: see if I can make the grocery list name dynamic? */}
       <main>
         <section>
           <h2>Add Item</h2>

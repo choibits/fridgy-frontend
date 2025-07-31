@@ -11,7 +11,6 @@ If Logged In: The “Login” and “Sign Up” buttons must be hidden. Instead,
 const Navbar = (): JSX.Element => {
 
   return (
-    // TODO: Home should only be visible to logged in users??
     <nav>
       <Flex
         as="main"

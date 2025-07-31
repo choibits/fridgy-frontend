@@ -1,5 +1,13 @@
 import { useEffect, useState, useContext } from "react";
-import { Box, Heading, Text, Table, Button, Flex, Link} from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Text,
+  Table,
+  Button,
+  Flex,
+  Link,
+} from "@chakra-ui/react";
 import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../config";
 
@@ -48,9 +56,13 @@ const Profile = () => {
 
   if (!profile) {
     return (
-      <Box p={8}>
-        <Text>No profile found.</Text>
-      </Box>
+      <>
+        <Box p={8}>
+          <Text>No profile found.</Text>
+        </Box>
+        {/* TODO: Need to add create profile functionality... */}
+        <Button>Create profile</Button>
+      </>
     );
   }
 
@@ -58,16 +70,16 @@ const Profile = () => {
     <>
       <Flex as="main" direction="column" align="center" minH="100vh" p={8}>
         <Heading size="2xl">My Profile</Heading>
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignSelf="center"
-                minW="50vw"
-                p={4}
-              >
-                {/* TODO: Come back and change this to profile info, also need an "if" no profile handling and error handling */}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignSelf="center"
+          minW="50vw"
+          p={4}
+        >
+          {/* TODO: Come back and change this to profile info, also need an "if" no profile handling and error handling */}
 
-                {/* <Table.Root size="sm" interactive>
+          {/* <Table.Root size="sm" interactive>
                   <Table.Header>
                     <Table.Row>
                       <Table.ColumnHeader>Fridge name</Table.ColumnHeader>
@@ -100,8 +112,7 @@ const Profile = () => {
                     ))}
                   </Table.Body>
                 </Table.Root> */}
-                
-              </Box>
+        </Box>
       </Flex>
     </>
   );
