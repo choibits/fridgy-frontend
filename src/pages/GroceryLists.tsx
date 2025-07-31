@@ -1,4 +1,4 @@
-import { type JSX, useState } from "react";
+import { type JSX, useState, useContext, useEffect } from "react";
 import {
   Stack,
   Heading,
@@ -11,6 +11,9 @@ import {
   Input,
   Button,
 } from "@chakra-ui/react";
+import { AuthContext } from "../context/AuthContext";
+import { API_BASE_URL } from "../config";
+import type { GroceryList } from "../types";
 
 interface formData {
   listName: string;
@@ -20,10 +23,17 @@ const GroceryLists = (): JSX.Element => {
   const [formData, setFormData] = useState<formData>({
     listName: "",
   });
-
   const [error, setError] = useState<string>("");
   const { listName } = formData;
+  const [groceryLists, setGroceryLists] = useState<GroceryList[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { authData } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (authData?.token) {
+      getGroceryLists();
+    }
+  }, [authData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -49,58 +59,68 @@ const GroceryLists = (): JSX.Element => {
 
   const createList = async () => {
     try {
-      const response = await fetch("/grocerylists", {
+      const response = await fetch(`${API_BASE_URL}/grocerylists`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authData?.token}`,
         },
         body: JSON.stringify({ listName }),
       });
 
       const data = await response.json();
       if (!response.ok) {
-        setError("Call failed. Please try again.");
-        throw new Error("Create grocery list call failed");
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Create grocery list call failed. Please try again.");
+        }
+        return;
       }
       console.log(data);
     } catch (error) {
       console.error("Error creating grocery list:", error);
       if (error instanceof Error) {
-        setError(
-          "Error creating grocery list. Please try again. Error message: " +
-            error.message
-        );
+        setError("Error creating grocery list. Please try again.");
+        console.log(error.message);
       } else {
-        console.log(
-          setError("Error creating grocery list... Please try again.")
-        );
+        setError("Error creating grocery list... Please try again.");
       }
     }
+    await getGroceryLists(); // Refresh list after creation
   };
 
   const getGroceryLists = async () => {
     try {
-      const response = await fetch("/grocerylists/:id", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Get grocery lists call failed");
+      const response = await fetch(
+        `${API_BASE_URL}/grocerylists/users/${authData?.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
       const data = await response.json();
+      if (!response.ok) {
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Get grocery lists call failed. Please try again.");
+        }
+        return;
+      }
+      setGroceryLists(data); // Stores grocery lists in state
       console.log(data);
     } catch (error) {
       console.error("Error getting grocery lists:", error);
-      if (error instanceof Error) {
-        setError(
-          "Error getting grocery lists. Please try again. Error message: " +
-            error.message
-        );
-      } else {
-        console.log(
-          setError("Error getting grocery lists... Please try again.")
-        );
-      }
+     if (error instanceof Error) {
+       setError("Error getting grocery lists. Please try again.");
+       console.log(error.message);
+     } else {
+       setError("Error getting grocery lists... Please try again.");
+     }
     }
   };
 
@@ -123,10 +143,16 @@ const GroceryLists = (): JSX.Element => {
           minW="50vw"
           p={4}
         >
-          <Stack>
-            <Link variant="underline" to="/grocerylists/1">
-              Grocery List 1
-            </Link>
+          <Stack gap={2}>
+            {groceryLists.map((list) => (
+              <Link
+                key={list.id}
+                variant="underline"
+                href={`/grocerylists/${list.id}`}
+              >
+                {list.listName}
+              </Link>
+            ))}
           </Stack>
         </Box>
 
@@ -149,8 +175,8 @@ const GroceryLists = (): JSX.Element => {
                   <Field.Root>
                     <Field.Label>List name: </Field.Label>
                     <Input
-                      type="name"
-                      name="name"
+                      type="text"
+                      name="listName"
                       value={formData.listName}
                       onChange={handleChange}
                       required
