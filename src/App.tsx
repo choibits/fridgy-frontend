@@ -4,7 +4,6 @@ import Home from "./pages/Home";
 import GroceryLists from "./pages/GroceryLists";
 import Refrigerators from "./pages/Refrigerators";
 import GroceryListDetails from "./pages/GroceryListDetails";
-import RefrigeratorDetails from "./pages/RefrigeratorDetails";
 import ItemDetails from "./pages/ItemDetails";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
@@ -88,7 +87,7 @@ const App = () => {
           <Route path="/grocerylists" element={<GroceryLists />} />
           <Route path="/refrigerators" element={<Refrigerators />} />
           <Route path="/profile" element={<Profile />} />
-          
+
           <Route path="/grocerylist/id:" element={<GroceryListDetails />} />
           
           <Route path="/grocerylistdetails" element={<GroceryListDetails />} />

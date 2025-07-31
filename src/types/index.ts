@@ -26,6 +26,7 @@ export interface User {
 export interface GroceryList {
   id?: number;
   listName: string;
+  items?: Item[];
 }
 
 export interface Refrigerator {
@@ -39,3 +40,5 @@ export interface Item {
   quantity: number;
   expirationDate: string;
 }
+
+// generate recipe by looking at the names of the items in the refrigerator 

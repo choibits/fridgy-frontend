@@ -1,6 +1,6 @@
 import { type JSX, useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import type { Item } from "../types";
+import type { GroceryList } from "../types";
 import {
   Flex,
   Heading,
@@ -32,13 +32,13 @@ const GroceryList = (): JSX.Element => {
   });
   const { itemName, quantity, expirationDate } = formData;
   const [error, setError] = useState<string>("");
-  const [items, setItems] = useState<Item[]>([]);
+  const [groceryList, setGroceryList] = useState<GroceryList | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { authData } = useContext(AuthContext);
 
   useEffect(() => {
     if (authData?.token) {
-      getItems();
+      getGroceryList();
     }
   }, [authData]);
 
@@ -94,19 +94,22 @@ const GroceryList = (): JSX.Element => {
         setError("Error creating item... Please try again.");
       }
     }
-    await getItems(); // Refresh list after creation
+    await getGroceryList(); // Refresh list after creation
     console.log("Items in state:", items);
   };
 
-  const getItems = async () => {
+  const getGroceryList = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/items/${authData?.id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authData?.token}`,
-        },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/grocerylists/${authData?.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
       const data = await response.json();
       if (!response.ok) {
         if (data && data.message) {
@@ -116,7 +119,7 @@ const GroceryList = (): JSX.Element => {
         }
         return;
       }
-      setItems(data); // Stores grocery lists in state
+      setGroceryList(data); // Stores grocery lists in state
       console.log(data);
     } catch (error) {
       console.error("Error getting grocery lists:", error);
@@ -132,16 +135,29 @@ const GroceryList = (): JSX.Element => {
   const handleDeleteItem = async (itemId: number | undefined) => {
     if (itemId === undefined) return; // extra safety check
     try {
-      const token = localStorage.getItem("token"); // Adjust based on where you store it
+    
+      const groceryListId = groceryList?.id;
+      // TODO: make sure all of my fetches are not using localStorage vs. authData
 
-      // TODO: need to check on this url....
-      await fetch(`${API_BASE_URL}/items/${itemId}`, {
+      const response = await fetch(`${API_BASE_URL}/grocerylists/${groceryListId}/items/${itemId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authData?.token}`,
         },
       });
-      setItems((prevLists) => prevLists.filter((item) => item.id !== itemId));
+      console.log(response);
+      setGroceryList((prevState) => {
+        if (prevState) {
+          const updatedItems = prevState?.items?.filter(
+            (item) => item.id !== itemId
+          );
+          // redefine the items
+          return { ...prevState, items: updatedItems };
+        }
+        return prevState;
+      });
+
+      // setItems((prevLists) => prevLists.filter((item) => item.id !== itemId));
     } catch (error) {
       console.error("Failed to delete item", error);
     }
@@ -178,7 +194,7 @@ const GroceryList = (): JSX.Element => {
     setEditingItemId(null);
   };
 
-  const rows = items.map((item) => (
+  const rows = groceryList?.items?.map((item) => (
     <Table.Row
       key={item.id}
       data-selected={selection.includes(item.itemName) ? "" : undefined}
