@@ -10,6 +10,7 @@ import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import About from "./pages/About";
+import Profile from "./pages/Profile";
 import Footer from "./components/footer/Footer";
 import { AuthContext } from "./context/AuthContext";
 import { useState, useEffect } from "react";
@@ -86,6 +87,7 @@ const App = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/grocerylists" element={<GroceryLists />} />
           <Route path="/refrigerators" element={<Refrigerators />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/grocerylist/id:" element={<GroceryListDetails />} />
           <Route path="/refrigerator/:id" element={<RefrigeratorDetails />} />
 
