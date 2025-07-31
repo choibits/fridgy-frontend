@@ -101,7 +101,6 @@ const Profile = () => {
                         </Table.Cell>
                         <Table.Cell textAlign="end">
                           <Button
-                            colorScheme="red"
                             size="sm"
                             onClick={() => handleDelete(fridge.id)}
                           >

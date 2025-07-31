@@ -88,8 +88,10 @@ const App = () => {
           <Route path="/grocerylists" element={<GroceryLists />} />
           <Route path="/refrigerators" element={<Refrigerators />} />
           <Route path="/profile" element={<Profile />} />
+          
           <Route path="/grocerylist/id:" element={<GroceryListDetails />} />
-          <Route path="/refrigerator/:id" element={<RefrigeratorDetails />} />
+          
+          <Route path="/grocerylistdetails" element={<GroceryListDetails />} />
 
           {/* TODO: Not sure about this path? */}
           <Route path="/refrigerator/:id/food/:id" element={<ItemDetails />} />

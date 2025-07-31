@@ -155,7 +155,6 @@ const Login = (): JSX.Element => {
                 <Button
                   type="submit"
                   variant="solid"
-                  colorScheme="blue"
                   w="full"
                   disabled={isLoading}
                 >

@@ -184,7 +184,6 @@ const GroceryLists = (): JSX.Element => {
                   </Table.Cell>
                   <Table.Cell textAlign="end">
                     <Button
-                      colorScheme="red"
                       size="sm"
                       onClick={() => handleDeleteList(list.id)}
                     >

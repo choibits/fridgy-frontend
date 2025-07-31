@@ -13,32 +13,14 @@ export interface LocalStorageStatus {
   message: string;
 }
 
+// TODO: check if i need this User type I think the AuthResponse is doing that work now?
 // ==== USER TYPES ====
 export interface User {
   id?: number;
   email: string;
   password: string;
-  agreeToTerms: boolean;
 }
 
-// ==== SIGNUP FORM TYPES ====
-export interface SignupFormData {
-  email: string;
-  password: string;
-  agreeToTerms: boolean;
-}
-
-export type SignupFormErrors = {
-  email?: string;
-  password?: string;
-  agreeToTerms?: string;
-};
-
-// ==== LOGIN FORM TYPES ====
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
 
 // ==== TYPES ====
 export interface GroceryList {
@@ -52,8 +34,8 @@ export interface Refrigerator {
 }
 
 export interface Item {
-  id: number;
-  name: string;
+  id?: number;
+  itemName: string;
   quantity: number;
   expirationDate: string;
 }

@@ -1,5 +1,5 @@
 import { type JSX } from "react";
-import type { SignupFormData, SignupFormErrors } from "../types";
+
 import {
   Button,
   Card,
@@ -120,7 +120,7 @@ const SignupForm = ({
           </Card.Body>
 
           <Card.Footer flexDirection="column" alignItems="flex-start" gap={3}>
-            <Button type="submit" variant="solid" colorScheme="blue" w="full">
+            <Button type="submit" variant="solid" w="full">
               Submit
             </Button>
             <Text fontSize="sm">

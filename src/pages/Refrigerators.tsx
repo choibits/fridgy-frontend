@@ -145,7 +145,6 @@ const Refrigerators = (): JSX.Element => {
                 </Table.Cell>
                 <Table.Cell textAlign="end">
                   <Button
-                    colorScheme="red"
                     size="sm"
                     onClick={() => handleDelete(fridge.id)}
                   >
