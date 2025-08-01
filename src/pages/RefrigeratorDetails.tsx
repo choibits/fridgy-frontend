@@ -366,7 +366,11 @@ const RefrigeratorDetails = (): JSX.Element => {
             {error}
           </Text>
         )}
-        <Button w="200px" onClick={handleSuggestRecipeClick}>
+        <Button
+          w="200px"
+          onClick={handleSuggestRecipeClick}
+          loading={loadingRecipe}
+        >
           Suggest Recipe
         </Button>
         <Flex>
