@@ -14,12 +14,21 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
   - Delete items when used up
 - UI is built to emphasize productivity and simplicity
 
-## Technologies used
+## Frontend Technologies
 - **React**: Used for building the UI with components like Header, GroceryListDetails, RefrigeratorDetails
 - **TypeScript**: Provides type safety across components and API calls
 - **Chakra UI**: Component library for rapid, accessible, and styled components
 - **React Router**: Handles frontend routing (e.g., `/grocery-list/:id`, `/refrigerator/:id`)
-- **Axios**: For sending HTTP requests to the backend
 - **Context API**: For managing authentication state (AuthContext)
 - **LocalStorage**: Persists JWT tokens for authenticated sessions
 - **Pollinations API**: Used to suggest recipes based on fridge items
+
+## Backend Technologies
+- **Java 17**
+- **Spring Boot** (REST controllers, service layer, JPA repositories)
+- **JWT**: Used for user authentication
+- **Spring Security**: Secures endpoints and manages authentication
+- **JPA + Hibernate**: ORM for interacting with PostgreSQL (or H2 for dev)
+- **PostgreSQL**: Primary database for production
+- **ModelMapper**: Used to map between Entity and DTO classes
+- **Lombok**: Reduces boilerplate code with annotations like `@Getter`, `@Setter`, `@AllArgsConstructor`
