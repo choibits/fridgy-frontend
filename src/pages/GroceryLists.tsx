@@ -128,11 +128,11 @@ const GroceryLists = (): JSX.Element => {
   const handleDeleteList = async (listId: number | undefined) => {
     if (listId === undefined) return; // extra safety check
     try {
-      const token = localStorage.getItem("token"); // Adjust based on where you store it
+      
       await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authData?.token}`,
         },
       });
       setGroceryLists((prevLists) =>

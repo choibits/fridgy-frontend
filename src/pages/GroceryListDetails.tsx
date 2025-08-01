@@ -1,5 +1,6 @@
 import { type JSX, useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useParams } from "react-router-dom";
 import type { GroceryList } from "../types";
 import {
   Flex,
@@ -35,12 +36,14 @@ const GroceryList = (): JSX.Element => {
   const [groceryList, setGroceryList] = useState<GroceryList | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { authData } = useContext(AuthContext);
+  const { id: listId } = useParams();
 
+  // ==== USE EFFECTS =====
   useEffect(() => {
-    if (authData?.token) {
+    if (authData?.token && listId) {
       getGroceryList();
     }
-  }, [authData]);
+  }, [authData, listId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,14 +69,17 @@ const GroceryList = (): JSX.Element => {
 
   const createItem = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/items`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authData?.token}`,
-        },
-        body: JSON.stringify({ itemName, quantity, expirationDate }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/grocerylists/${listId}/items`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+          body: JSON.stringify({ itemName, quantity, expirationDate }),
+        }
+      );
 
       const data = await response.json();
       if (!response.ok) {
@@ -95,21 +101,17 @@ const GroceryList = (): JSX.Element => {
       }
     }
     await getGroceryList(); // Refresh list after creation
-    console.log("Items in state:", items);
   };
 
   const getGroceryList = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/grocerylists/${authData?.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authData?.token}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData?.token}`,
+        },
+      });
       const data = await response.json();
       if (!response.ok) {
         if (data && data.message) {
@@ -135,16 +137,18 @@ const GroceryList = (): JSX.Element => {
   const handleDeleteItem = async (itemId: number | undefined) => {
     if (itemId === undefined) return; // extra safety check
     try {
-    
       const groceryListId = groceryList?.id;
       // TODO: make sure all of my fetches are not using localStorage vs. authData
 
-      const response = await fetch(`${API_BASE_URL}/grocerylists/${groceryListId}/items/${itemId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${authData?.token}`,
-        },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/grocerylists/${groceryListId}/items/${itemId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
       console.log(response);
       setGroceryList((prevState) => {
         if (prevState) {
@@ -164,8 +168,11 @@ const GroceryList = (): JSX.Element => {
   };
 
   // ===== TABLE SPECIFIC STATES AND FUNCTIONS =====
+  // tracks items selected via checkbox
   const [selection, setSelection] = useState<string[]>([]);
+  // determines if checkboxes are partially checked - i.e. true when some but not all items are checked, false if its all or none items
   const indeterminate = selection.length > 0 && selection.length < items.length;
+  // tracks which item is being edited
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [formValues, setFormValues] = useState({
     itemName: "",
@@ -188,9 +195,57 @@ const GroceryList = (): JSX.Element => {
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // TODO: Call your API or update state here
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/items/${editingItemId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData?.token}`,
+        },
+        body: JSON.stringify({
+          itemName: formValues.itemName,
+          quantity: parseInt(formValues.quantity), // Convert string to number
+          expirationDate: formValues.expirationDate,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Update item call failed. Please try again.");
+        }
+        return;
+      }
+    } catch (error) {
+      console.error("Error updating item:", error);
+      if (error instanceof Error) {
+        setError("Error updating item. Please try again.");
+        console.log(error.message);
+      } else {
+        setError("Error updating item... Please try again.");
+      }
+    }
     console.log("Saving updated item:", editingItemId, formValues);
+    // Update local state immediately
+    setGroceryList((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        items:
+          prev.items?.map((item) =>
+            item.id === editingItemId
+              ? {
+                  ...item,
+                  itemName: formValues.itemName,
+                  quantity: parseInt(formValues.quantity),
+                  expirationDate: formValues.expirationDate,
+                }
+              : item
+          ) ?? [],
+      };
+    });
     setEditingItemId(null);
   };
 
@@ -270,6 +325,7 @@ const GroceryList = (): JSX.Element => {
                           onChange={handleEditChange}
                         />
                       </Field.Root>
+
                       <Button onClick={handleSave} colorScheme="green">
                         Save
                       </Button>
@@ -302,8 +358,7 @@ const GroceryList = (): JSX.Element => {
         p={8}
         textAlign="center"
       >
-        {/* TODO: Make grocery list name dynamic */}
-        <Heading size="2xl">Grocery List Name</Heading>
+        <Heading size="2xl">{groceryList?.listName}</Heading>
         <Box
           display="flex"
           justifyContent="center"
@@ -388,7 +443,9 @@ const GroceryList = (): JSX.Element => {
                   }
                   onCheckedChange={(changes) => {
                     setSelection(
-                      changes.checked ? items.map((item) => item.itemName) : []
+                      changes.checked
+                        ? groceryList?.items?.map((item) => item.itemName)
+                        : []
                     );
                   }}
                 >
@@ -404,6 +461,10 @@ const GroceryList = (): JSX.Element => {
           </Table.Header>
           <Table.Body>{rows}</Table.Body>
         </Table.Root>
+        <br></br>
+        <Button type="submit" w="200px" disabled={isLoading}>
+          Add to Refrigerator
+        </Button>
       </Flex>
     </>
   );
