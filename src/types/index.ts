@@ -32,6 +32,7 @@ export interface GroceryList {
 export interface Refrigerator {
   id: number;
   fridgeName: string;
+  items?: Item[];
 }
 
 export interface Item {

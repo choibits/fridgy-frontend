@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import GroceryLists from "./pages/GroceryLists";
 import Refrigerators from "./pages/Refrigerators";
 import GroceryListDetails from "./pages/GroceryListDetails";
-import ItemDetails from "./pages/ItemDetails";
+import RefrigeratorDetails from "./pages/RefrigeratorDetails";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -87,11 +87,8 @@ const App = () => {
           <Route path="/grocerylists" element={<GroceryLists />} />
           <Route path="/refrigerators" element={<Refrigerators />} />
           <Route path="/profile" element={<Profile />} />
-          
           <Route path="/grocerylists/:id" element={<GroceryListDetails />} />
-
-          {/* TODO: Not sure about this path? */}
-          <Route path="/refrigerator/:id/food/:id" element={<ItemDetails />} />
+          <Route path="/refrigerators/:id" element={<RefrigeratorDetails />} />
         </Routes>
         <Footer />
       </AuthContext.Provider>
