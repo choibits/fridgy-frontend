@@ -1,5 +1,6 @@
 # fridgy-frontend
 <img src="./src/assets/Fridgy ERD.png" alt="Fridgy ERD" width="750"/>
+
 ## Description
 Fridgy is a web app for managing groceries and refrigerator items. The goal of this app is to help users track items they want to buy (Grocery List) and items they already have (Refrigerator). This frontend app allows users to register, log in, create grocery lists, add items, mark items as bought, and transfer them into their refrigerator—all using a clean, list-based UI.
 
