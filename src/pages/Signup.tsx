@@ -83,7 +83,7 @@ const Signup = (): JSX.Element => {
       [typedName]: errorMessage, // use typedName vs. name because we want to use the typedName (which is a key of SignupFormErrors) for Typescript
     }));
 
-    // TODO: not sure about this part
+    // TODO: re look into this part
     if (errorMessage) {
       return;
     }

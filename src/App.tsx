@@ -8,9 +8,8 @@ import RefrigeratorDetails from "./pages/RefrigeratorDetails";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import About from "./pages/About";
 import Profile from "./pages/Profile";
-import Footer from "./components/footer/Footer";
+import Footer from "./components/Footer";
 import { AuthContext } from "./context/AuthContext";
 import { useState, useEffect } from "react";
 import type { AuthResponse } from "./types";
@@ -81,7 +80,6 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth/signup" element={<Signup />} />
-          <Route path="/about" element={<About />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
           <Route path="/grocerylists" element={<GroceryLists />} />

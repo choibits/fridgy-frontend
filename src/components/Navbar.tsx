@@ -2,12 +2,6 @@ import { type JSX } from "react";
 import { Link } from "react-router-dom";
 import { Button, Menu, Portal, Flex } from "@chakra-ui/react";
 
-// TODO:
-/* Your application’s name or logo.
-Conditional Buttons: The buttons displayed must change based on the user’s authentication status.
-If Logged Out: The navbar must show a “Login” button and a “Sign Up” button.
-If Logged In: The “Login” and “Sign Up” buttons must be hidden. Instead, a single button like “Go to Dashboard” or “Open App” should be displayed, allowing the user to enter the main part of your application. */
-
 const Navbar = (): JSX.Element => {
 
   return (

@@ -42,4 +42,9 @@ export interface Item {
   expirationDate: string;
 }
 
-// generate recipe by looking at the names of the items in the refrigerator 
+export interface Recipe {
+  id: number;
+  prompt: string;
+  response: string;
+}
+

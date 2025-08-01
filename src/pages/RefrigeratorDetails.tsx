@@ -271,6 +271,42 @@ const RefrigeratorDetails = (): JSX.Element => {
     </Table.Row>
   ));
 
+  // ==== RECIPE FUCNTIONS AND STATES ====
+  const [recipeResult, setRecipeResult] = useState<string | null>(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(false);
+  const [recipeError, setRecipeError] = useState<string | null>(null);
+
+
+  const handleSuggestRecipeClick = async () => {
+    if (selection.length === 0) {
+      setRecipeError("Please select at least one ingredient.");
+      return;
+    }
+
+    const prompt = `Recipe with ${selection.join(", ")}`;
+
+    try {
+      setLoadingRecipe(true);
+      setRecipeError(null);
+      const res = await fetch(`https://text.pollinations.ai/prompt/${prompt}`);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch recipe.");
+      }
+
+      const text = await res.text();
+      setRecipeResult(text);
+    } catch (err) {
+      if (err instanceof Error) {
+        setRecipeError(err.message);
+      } else {
+        setRecipeError("Unknown error occurred.");
+      }
+    } finally {
+      setLoadingRecipe(false);
+    }
+  };
+
   return (
     <>
       <Flex
@@ -330,6 +366,20 @@ const RefrigeratorDetails = (): JSX.Element => {
             {error}
           </Text>
         )}
+        <Button w="200px" onClick={handleSuggestRecipeClick}>
+          Suggest Recipe
+        </Button>
+        <Flex>
+          {/* Error message */}
+          {recipeError && <Text color="red.500">{recipeError}</Text>}
+
+          {/* Recipe result display */}
+          {recipeResult && (
+            <Box mt={4} p={4} borderWidth="1px" borderRadius="md" bg="gray.50">
+              <Text whiteSpace="pre-line">{recipeResult}</Text>
+            </Box>
+          )}
+        </Flex>
       </Flex>
     </>
   );
