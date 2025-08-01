@@ -1,7 +1,7 @@
 import { type JSX, useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
-import type { GroceryList } from "../types";
+import type { GroceryList, Refrigerator, Item } from "../types";
 import {
   Flex,
   Heading,
@@ -16,6 +16,8 @@ import {
   Portal,
   Popover,
   Checkbox,
+  Select,
+  createListCollection,
 } from "@chakra-ui/react";
 import { API_BASE_URL } from "../config";
 
@@ -171,7 +173,10 @@ const GroceryList = (): JSX.Element => {
   // tracks items selected via checkbox
   const [selection, setSelection] = useState<string[]>([]);
   // determines if checkboxes are partially checked - i.e. true when some but not all items are checked, false if its all or none items
-  const indeterminate = selection.length > 0 && selection.length < items.length;
+  const indeterminate =
+    selection.length > 0 &&
+    groceryList?.items &&
+    selection.length < groceryList.items.length;
   // tracks which item is being edited
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [formValues, setFormValues] = useState({
@@ -348,6 +353,95 @@ const GroceryList = (): JSX.Element => {
     </Table.Row>
   ));
 
+  // ==== ADD TO REFRIGERATOR SECTION ====
+  const [refrigerators, setRefrigerators] = useState<Refrigerator[]>([]);
+  const [selectedFridgeId, setSelectedFridgeId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const getRefrigerators = async () => {
+      if (!authData?.token) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/refrigerators`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authData.token}`,
+          },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.message || "Failed to fetch refrigerators");
+        }
+        setRefrigerators(data);
+      } catch (error) {
+        console.error("Error fetching refrigerators:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load refrigerators"
+        );
+      }
+    };
+
+    getRefrigerators();
+  }, [authData]);
+
+  const handleAddToRefrigerator = async () => {
+    // Validation checks
+    if (!selectedFridgeId) {
+      setError("Please select a refrigerator first");
+      return;
+    }
+
+    if (!selection.length) {
+      setError("Please select at least one item");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Get the full item objects for selected items
+      const selectedItemIds =
+        groceryList?.items
+          ?.filter((item) => selection.includes(item.itemName))
+          .map((item) => item.id) ?? [];
+
+      const response = await fetch(
+        `${API_BASE_URL}/refrigerators/${selectedFridgeId}/items`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+          body: JSON.stringify(selectedItemIds),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data?.message || "Failed to add items");
+      }
+
+      // Clear selection on success
+      setSelection([]);
+    } catch (error) {
+      console.error("Error adding items:", error);
+      setError(error instanceof Error ? error.message : "Failed to add items");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fridgeCollection = createListCollection({
+    items: refrigerators.map((fridge) => ({
+      label: fridge.fridgeName,
+      value: fridge.id.toString(),
+    })),
+  });
+
   return (
     <>
       <Flex
@@ -441,11 +535,13 @@ const GroceryList = (): JSX.Element => {
                   checked={
                     indeterminate ? "indeterminate" : selection.length > 0
                   }
+                  // this code handls the select all checkbox "root"
                   onCheckedChange={(changes) => {
                     setSelection(
                       changes.checked
-                        ? groceryList?.items?.map((item) => item.itemName)
+                        ? groceryList?.items?.map((item) => item.itemName) ?? []
                         : []
+                      // ?? [] (nullish coalescing operator) ensures we always return an array, even if groceryList or items is undefined
                     );
                   }}
                 >
@@ -462,9 +558,38 @@ const GroceryList = (): JSX.Element => {
           <Table.Body>{rows}</Table.Body>
         </Table.Root>
         <br></br>
-        <Button type="submit" w="200px" disabled={isLoading}>
-          Add to Refrigerator
-        </Button>
+
+        <Flex gap={4} align="center" mt={4}>
+          <Select.Root
+            collection={fridgeCollection}
+            size="sm"
+            onValueChange={(value) => setSelectedFridgeId(Number(value.value))}
+          >
+            <Select.Trigger>
+              <Select.ValueText placeholder={"Select a refrigerator"} />
+            </Select.Trigger>
+            <Portal>
+              <Select.Positioner>
+                <Select.Content>
+                  {fridgeCollection.items.map((fridge) => (
+                    <Select.Item key={fridge.value} item={fridge}>
+                      {fridge.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+            </Portal>
+          </Select.Root>
+
+          {/* Add to Refrigerator Button */}
+          <Button
+            w="200px"
+            onClick={handleAddToRefrigerator}
+            disabled={!selection.length || !selectedFridgeId}
+          >
+            Add to Refrigerator
+          </Button>
+        </Flex>
       </Flex>
     </>
   );

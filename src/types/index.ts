@@ -30,7 +30,7 @@ export interface GroceryList {
 }
 
 export interface Refrigerator {
-  id?: number;
+  id: number;
   fridgeName: string;
 }
 
