@@ -20,7 +20,7 @@ const Home = (): JSX.Element => {
         </Link>
         <br></br>
         <Link to="/refrigerators">
-          <Button>My Refrgerators</Button>
+          <Button>My Refrigerators</Button>
         </Link>
       </Flex>
     </>
