@@ -535,7 +535,7 @@ const GroceryList = (): JSX.Element => {
                   checked={
                     indeterminate ? "indeterminate" : selection.length > 0
                   }
-                  // this code handls the select all checkbox "root"
+                  // this code handles the select all checkbox "root"
                   onCheckedChange={(changes) => {
                     setSelection(
                       changes.checked

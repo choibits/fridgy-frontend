@@ -1,3 +1,5 @@
+// Sign up page that collects email and password, validates inputs, and sends a POST request to the backend to create a new user.
+
 import { type JSX, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -62,6 +64,10 @@ const Signup = (): JSX.Element => {
       if (!value.trim()) error = "Email is required.";
       else if (!/\S+@\S+\.\S+/.test(value))
         error = "Email must be valid (contain @ and .)";
+      // 	\S+ = one or more non-whitespace characters
+      // @ = must contain an @ symbol
+      // . = must contain a dot after the @
+      // .test(value) returns true if the value matches, otherwise false.
     } else if (name === "password" && typeof value === "string") {
       if (!value.trim()) error = "Password is required.";
       else if (value.length < 8 || !/[A-Z]/.test(value) || !/\d/.test(value))
@@ -73,6 +79,7 @@ const Signup = (): JSX.Element => {
   };
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    // event.target is the <input> element that lost focus.
     const { name, value } = event.target;
 
     const typedName = name as keyof SignupFormErrors; // tells typescript that the name is a key of FormData
@@ -83,7 +90,7 @@ const Signup = (): JSX.Element => {
       [typedName]: errorMessage, // use typedName vs. name because we want to use the typedName (which is a key of SignupFormErrors) for Typescript
     }));
 
-    // TODO: re look into this part
+    // early exit if there's an error
     if (errorMessage) {
       return;
     }
@@ -101,6 +108,7 @@ const Signup = (): JSX.Element => {
       const error = validateField(typedName, formData[typedName]);
       fieldErrors[typedName] = error;
     }
+    // need loading states to prevent double actions otherwise user could submit multiple times and create duplicate post requests (users in this case)
     setIsLoading(true);
     await signup();
     setIsLoading(false);
@@ -118,7 +126,7 @@ const Signup = (): JSX.Element => {
       });
 
       if (!response.ok) {
-        throw new Error("Signup failed");
+        throw new Error("Account not created");
       }
       const data = await response.json();
       console.log(data);
@@ -127,10 +135,10 @@ const Signup = (): JSX.Element => {
       console.error("Login error:", error);
       if (error instanceof Error) {
         setError(
-          "Login failed. Please try again. Error message: " + error.message
+          "Signup failed. Please try again. Error message: " + error.message
         );
       } else {
-        setError("Login failed. Please try again.");
+        setError("Signup failed. Please try again.");
       }
     }
   };
@@ -211,6 +219,7 @@ const Signup = (): JSX.Element => {
                   variant="solid"
                   w="full"
                   disabled={isLoading}
+                  // submit button is disabled if isLoading is true
                 >
                   Submit
                 </Button>

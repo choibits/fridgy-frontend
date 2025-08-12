@@ -78,14 +78,16 @@ const Login = (): JSX.Element => {
         if (data && data.message) {
           setError(data.message);
         } else {
-          setError("Login call failed. Please try again.");
+          setError("User login error. Check email and password.");
         }
         return;
       }
 
       console.log(data);
+      // stores auth info aka token persistently in local storage (long term memory)
       saveAuthData(data);
-      setIsAuthenticated(true);
+      setIsAuthenticated(true); // for the global Context
+      // stores auth info in memory for current session to AuthContext- this is what react components read from and faster than localStorage (short term memory)
       setAuthData(data);
       navigate("/home");
     } catch (error) {

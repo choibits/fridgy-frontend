@@ -1,3 +1,4 @@
+// Global context so you don't have to pass isAuthenticated and authData to every component
 import { createContext} from "react";
 import type {AuthResponse} from "../types";
 
