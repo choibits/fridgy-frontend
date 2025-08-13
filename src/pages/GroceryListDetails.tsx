@@ -1,4 +1,4 @@
-import { type JSX, useState, useContext, useEffect } from "react";
+import { type JSX, useState, useContext, useEffect, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
 import type { GroceryList, Refrigerator, Item } from "../types";
@@ -40,12 +40,42 @@ const GroceryList = (): JSX.Element => {
   const { authData } = useContext(AuthContext);
   const { id: listId } = useParams();
 
-  // ==== USE EFFECTS =====
+  const getGroceryList = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authData?.token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Get grocery lists call failed. Please try again.");
+        }
+        return;
+      }
+      setGroceryList(data); // Stores grocery lists in state
+      console.log(data);
+    } catch (error) {
+      console.error("Error getting grocery lists:", error);
+      if (error instanceof Error) {
+        setError("Error getting grocery lists. Please try again.");
+        console.log(error.message);
+      } else {
+        setError("Error getting grocery lists... Please try again.");
+      }
+    }
+  }, [authData?.token, listId]);
+
   useEffect(() => {
     if (authData?.token && listId) {
       getGroceryList();
     }
-  }, [authData, listId]);
+  }, [authData, listId, getGroceryList]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,7 +118,7 @@ const GroceryList = (): JSX.Element => {
         if (data && data.message) {
           setError(data.message);
         } else {
-          setError("Create item call failed. Please try again.");
+          setError("Create item call failed.");
         }
         return;
       }
@@ -97,7 +127,6 @@ const GroceryList = (): JSX.Element => {
       console.error("Error creating item:", error);
       if (error instanceof Error) {
         setError("Error creating item. Please try again.");
-        console.log(error.message);
       } else {
         setError("Error creating item... Please try again.");
       }
@@ -105,42 +134,12 @@ const GroceryList = (): JSX.Element => {
     await getGroceryList(); // Refresh list after creation
   };
 
-  const getGroceryList = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authData?.token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        if (data && data.message) {
-          setError(data.message);
-        } else {
-          setError("Get grocery lists call failed. Please try again.");
-        }
-        return;
-      }
-      setGroceryList(data); // Stores grocery lists in state
-      console.log(data);
-    } catch (error) {
-      console.error("Error getting grocery lists:", error);
-      if (error instanceof Error) {
-        setError("Error getting grocery lists. Please try again.");
-        console.log(error.message);
-      } else {
-        setError("Error getting grocery lists... Please try again.");
-      }
-    }
-  };
-
+  // itemId could be undefined if you haven't entered a value yet (vs. pre setting 0)
   const handleDeleteItem = async (itemId: number | undefined) => {
     if (itemId === undefined) return; // extra safety check
     try {
+      // check if groceryList id exists
       const groceryListId = groceryList?.id;
-      // TODO: make sure all of my fetches are not using localStorage vs. authData
 
       const response = await fetch(
         `${API_BASE_URL}/grocerylists/${groceryListId}/items/${itemId}`,
@@ -151,7 +150,16 @@ const GroceryList = (): JSX.Element => {
           },
         }
       );
-      console.log(response);
+      const data = await response.json();
+      if (!response.ok) {
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Delete Grocery List item call failed.");
+        }
+        return;
+      }
+
       setGroceryList((prevState) => {
         if (prevState) {
           const updatedItems = prevState?.items?.filter(
@@ -162,10 +170,11 @@ const GroceryList = (): JSX.Element => {
         }
         return prevState;
       });
-
+      // items is nested in the grocery list so we don't need a state for items
       // setItems((prevLists) => prevLists.filter((item) => item.id !== itemId));
     } catch (error) {
       console.error("Failed to delete item", error);
+      // TODO: handle error
     }
   };
 
@@ -257,6 +266,8 @@ const GroceryList = (): JSX.Element => {
   const rows = groceryList?.items?.map((item) => (
     <Table.Row
       key={item.id}
+      // data-selected adds a custom HTML attribute if row's itemName is in the selection array - so the table rows have data-selected only when selected
+      // if row is selected, data selected will be "" meaning it exists, otherwise undefined. react will omit attributes with undefined values
       data-selected={selection.includes(item.itemName) ? "" : undefined}
     >
       <Table.Cell>
@@ -264,12 +275,16 @@ const GroceryList = (): JSX.Element => {
           size="sm"
           mt="0.5"
           aria-label="Select row"
+          // boolean to check if row is selected
           checked={selection.includes(item.itemName)}
+          // when user toggles checkbox, update selection array if changes.checked is true, otherwise remove from array
           onCheckedChange={(changes) => {
-            setSelection((prev) =>
-              changes.checked
-                ? [...prev, item.itemName]
-                : selection.filter((name) => name !== item.itemName)
+            setSelection(
+              (prev) =>
+                // this checkbox don't pass a boolean, it passes an object with a checked property that could be true or false - hence changes.checked
+                changes.checked
+                  ? [...prev, item.itemName] // if checked add item
+                  : selection.filter((name) => name !== item.itemName) // it not checked remove item from selection
             );
           }}
         >
@@ -283,7 +298,9 @@ const GroceryList = (): JSX.Element => {
       <Table.Cell>
         <Flex gap={2}>
           <Popover.Root
+            // Only opens if editingItemId matches the current row’s ID.
             open={editingItemId === item.id}
+            // onOpenChange: if the popover closes (isOpen = false), clear editingItemId
             onOpenChange={(isOpen) => {
               if (!isOpen) setEditingItemId(null);
             }}
@@ -291,13 +308,13 @@ const GroceryList = (): JSX.Element => {
             <Popover.Trigger asChild>
               <Button
                 size="sm"
-                colorScheme="blue"
                 variant="outline"
                 onClick={() => handleEditClick(item)}
               >
                 Edit
               </Button>
             </Popover.Trigger>
+            {/* Portal renders popover outside normal DOM flow so it's positioned correctly relative to the trigger */}
             <Portal>
               <Popover.Positioner>
                 <Popover.Content>
@@ -331,9 +348,7 @@ const GroceryList = (): JSX.Element => {
                         />
                       </Field.Root>
 
-                      <Button onClick={handleSave} colorScheme="green">
-                        Save
-                      </Button>
+                      <Button onClick={handleSave}>Save</Button>
                     </Stack>
                   </Popover.Body>
                   <Popover.CloseTrigger />
@@ -559,15 +574,22 @@ const GroceryList = (): JSX.Element => {
         </Table.Root>
         <br></br>
 
-        <Flex gap={4} align="center" mt={4}>
+        <Flex gap={4} align="center" mt={4} width="400px">
           <Select.Root
             collection={fridgeCollection}
             size="sm"
             onValueChange={(value) => setSelectedFridgeId(Number(value.value))}
           >
-            <Select.Trigger>
-              <Select.ValueText placeholder={"Select a refrigerator"} />
-            </Select.Trigger>
+            <Select.HiddenSelect />
+            <Select.Control>
+              <Select.Trigger>
+                <Select.ValueText placeholder={"Select a refrigerator"} />
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+
             <Portal>
               <Select.Positioner>
                 <Select.Content>

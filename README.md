@@ -35,13 +35,27 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
 - **Lombok**: Reduces boilerplate code with annotations like `@Getter`, `@Setter`, `@AllArgsConstructor`
 
 ## API Endpoints
-- **Authentication**
+
+### Authentication - signup and login pages
   - `POST /auth/signup`: Register a new user on Signup page
   - `POST /auth/login`: Log in with registered user on Login page
 
+### GroceryLists page
   - `GET /grocerylists/users/{userId}`: Get all grocery lists for a user
   - `POST /grocerylists`: Create a new grocery list
-  - `DELETE /grocerylists/{id}`: Delete a grocery list
+  - `DELETE /grocerylists/{listId}`: Delete a grocery list
+
+### GroceryListDetails page
+- `GET /grocerylists/{listId}`: Get details of a grocery list
+- `POST /grocerylists/{listId}/items`: Create an item in the grocery list
+- `DELETE /grocerylists/{listId}/items/{itemId}`: Delete an item from the grocery list
+- `PUT /grocerylists/items/{editingItemId}`: Update an item in the grocery list
+
+**Add to refrigerator section of GroceryListDetails page**
+- `GET /refrigerators`: Get all refrigerators to display in dropdown
+- `POST /refrigerators/{selectedFridgeId}/items`: Add items to fridge from checked items on the grocery list
+
+
 
 
 

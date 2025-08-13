@@ -142,6 +142,7 @@ const GroceryLists = (): JSX.Element => {
       );
     } catch (error) {
       console.error("Failed to delete list", error);
+      // TODO: Handle error
     }
   };
 
