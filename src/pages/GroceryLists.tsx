@@ -1,4 +1,4 @@
-import { type JSX, useState, useContext, useEffect } from "react";
+import { type JSX, useState, useContext, useEffect, useCallback } from "react";
 import {
   Stack,
   Heading,
@@ -30,11 +30,47 @@ const GroceryLists = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { authData } = useContext(AuthContext);
 
+  // Define function before using in use effect
+  // Memoizing is like saying - remember the result of a function so you don’t have to redo expensive work every time it’s called.
+  // So memoize with useCallback for functions used in useEffect
+  // then you can list in useEffect dependency array without an infinite loop
+  const getGroceryLists = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/grocerylists/users/${authData?.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        if (data && data.message) {
+          setError(data.message);
+        } else {
+          setError("Get grocery lists call failed. Please try again.");
+        }
+        return;
+      }
+      setGroceryLists(data); // Stores grocery lists in state
+      console.log(data);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError("Error getting grocery lists. Please try again.");
+      } else {
+        setError("Error getting grocery lists... Please try again.");
+      }
+    }
+  }, [authData?.token, authData?.id]); // Memoize only when these change
+
   useEffect(() => {
     if (authData?.token) {
       getGroceryLists();
     }
-  }, [authData]);
+  }, [authData, getGroceryLists]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,6 +92,8 @@ const GroceryLists = (): JSX.Element => {
     setIsLoading(true);
     await createList();
     setIsLoading(false);
+
+    setFormData({ listName: "" });
   };
 
   const createList = async () => {
@@ -83,7 +121,6 @@ const GroceryLists = (): JSX.Element => {
       console.error("Error creating grocery list:", error);
       if (error instanceof Error) {
         setError("Error creating grocery list. Please try again.");
-        console.log(error.message);
       } else {
         setError("Error creating grocery list... Please try again.");
       }
@@ -91,44 +128,9 @@ const GroceryLists = (): JSX.Element => {
     await getGroceryLists(); // Refresh list after creation
   };
 
-  const getGroceryLists = async () => {
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/grocerylists/users/${authData?.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authData?.token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        if (data && data.message) {
-          setError(data.message);
-        } else {
-          setError("Get grocery lists call failed. Please try again.");
-        }
-        return;
-      }
-      setGroceryLists(data); // Stores grocery lists in state
-      console.log(data);
-    } catch (error) {
-      console.error("Error getting grocery lists:", error);
-     if (error instanceof Error) {
-       setError("Error getting grocery lists. Please try again.");
-       console.log(error.message);
-     } else {
-       setError("Error getting grocery lists... Please try again.");
-     }
-    }
-  };
-
   const handleDeleteList = async (listId: number | undefined) => {
     if (listId === undefined) return; // extra safety check
     try {
-      
       await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
         method: "DELETE",
         headers: {
@@ -161,7 +163,6 @@ const GroceryLists = (): JSX.Element => {
           minW="50vw"
           p={4}
         >
-
           <Table.Root size="sm" interactive>
             <Table.Header>
               <Table.Row>
@@ -183,10 +184,7 @@ const GroceryLists = (): JSX.Element => {
                     </Link>
                   </Table.Cell>
                   <Table.Cell textAlign="end">
-                    <Button
-                      size="sm"
-                      onClick={() => handleDeleteList(list.id)}
-                    >
+                    <Button size="sm" onClick={() => handleDeleteList(list.id)}>
                       Delete
                     </Button>
                   </Table.Cell>

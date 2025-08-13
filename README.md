@@ -38,6 +38,10 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
 - **Authentication**
   - `POST /auth/signup`: Register a new user on Signup page
   - `POST /auth/login`: Log in with registered user on Login page
-  
+
+  - `GET /grocerylists/users/{userId}`: Get all grocery lists for a user
+  - `POST /grocerylists`: Create a new grocery list
+  - `DELETE /grocerylists/{id}`: Delete a grocery list
+
 
 
