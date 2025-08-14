@@ -45,7 +45,6 @@ const GroceryList = (): JSX.Element => {
       const response = await fetch(`${API_BASE_URL}/grocerylists/${listId}`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${authData?.token}`,
         },
       });
@@ -211,18 +210,21 @@ const GroceryList = (): JSX.Element => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/items/${editingItemId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authData?.token}`,
-        },
-        body: JSON.stringify({
-          itemName: formValues.itemName,
-          quantity: parseInt(formValues.quantity), // Convert string to number
-          expirationDate: formValues.expirationDate,
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/grocerylists/${listId}/items/${editingItemId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+          body: JSON.stringify({
+            itemName: formValues.itemName,
+            quantity: parseInt(formValues.quantity), // Convert string to number
+            expirationDate: formValues.expirationDate,
+          }),
+        }
+      );
       const data = await response.json();
       if (!response.ok) {
         if (data && data.message) {

@@ -1,4 +1,4 @@
-import { type JSX, useState, useContext, useEffect } from "react";
+import { type JSX, useState, useContext, useEffect, useCallback } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useParams } from "react-router-dom";
 import type { Refrigerator, Item } from "../types";
@@ -32,26 +32,19 @@ const RefrigeratorDetails = (): JSX.Element => {
   const { authData } = useContext(AuthContext);
   const { id: fridgeId } = useParams();
 
-  useEffect(() => {
-    if (authData?.token && fridgeId) {
-      getRefrigerator();
-    }
-  }, [authData, fridgeId]);
-
-  const getRefrigerator = async () => {
+  const getRefrigerator = useCallback(async () => {
     try {
       const response = await fetch(
         `${API_BASE_URL}/refrigerators/${fridgeId}`,
         {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${authData?.token}`,
           },
         }
       );
       const data = await response.json();
-    
+
       if (!response.ok) {
         if (data && data.message) {
           setError(data.message);
@@ -71,7 +64,13 @@ const RefrigeratorDetails = (): JSX.Element => {
         setError("Error getting refrigerator... Please try again.");
       }
     }
-  };
+  }, [authData?.token, fridgeId]);
+
+  useEffect(() => {
+    if (authData?.token && fridgeId) {
+      getRefrigerator();
+    }
+  }, [authData, fridgeId, getRefrigerator]);
 
   const handleDeleteItem = async (itemId: number | undefined) => {
     if (itemId === undefined) return;
@@ -116,19 +115,23 @@ const RefrigeratorDetails = (): JSX.Element => {
   };
 
   const handleSave = async () => {
+    if (!editingItemId) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/items/${editingItemId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authData?.token}`,
-        },
-        body: JSON.stringify({
-          itemName: formValues.itemName,
-          quantity: parseInt(formValues.quantity),
-          expirationDate: formValues.expirationDate,
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/refrigerators/${fridgeId}/items/${editingItemId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authData?.token}`,
+          },
+          body: JSON.stringify({
+            itemName: formValues.itemName,
+            quantity: parseInt(formValues.quantity),
+            expirationDate: formValues.expirationDate,
+          }),
+        }
+      );
       const data = await response.json();
       if (!response.ok) {
         if (data && data.message) {
@@ -210,7 +213,6 @@ const RefrigeratorDetails = (): JSX.Element => {
             <Popover.Trigger asChild>
               <Button
                 size="sm"
-                colorScheme="blue"
                 variant="outline"
                 onClick={() => handleEditClick(item)}
               >
@@ -249,9 +251,8 @@ const RefrigeratorDetails = (): JSX.Element => {
                           onChange={handleEditChange}
                         />
                       </Field.Root>
-                      <Button onClick={handleSave} colorScheme="green">
-                        Save
-                      </Button>
+
+                      <Button onClick={handleSave}>Save</Button>
                     </Stack>
                   </Popover.Body>
                   <Popover.CloseTrigger />
@@ -275,7 +276,6 @@ const RefrigeratorDetails = (): JSX.Element => {
   const [recipeResult, setRecipeResult] = useState<string | null>(null);
   const [loadingRecipe, setLoadingRecipe] = useState(false);
   const [recipeError, setRecipeError] = useState<string | null>(null);
-
 
   const handleSuggestRecipeClick = async () => {
     if (selection.length === 0) {
