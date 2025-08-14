@@ -1,47 +1,50 @@
 // This is  where we export the interfaces that mocks the API response data (from springboot RESTful API built on Java or a public API)
 
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  id: number;
+  email: string;
+  token: string;
+};
+
+export interface LocalStorageStatus {
+  success: boolean;
+  message: string;
+}
+
+// TODO: check if i need this User type I think the AuthResponse is doing that work now?
 // ==== USER TYPES ====
 export interface User {
   id?: number;
-  username: string;
-  email: string;
-  password: string;
-  agreeToTerms: boolean;
-}
-
-// ==== SIGNUP FORM TYPES ====
-export interface SignupFormData {
-  email: string;
-  username: string;
-  password: string;
-  agreeToTerms: boolean;
-}
-
-export type SignupFormErrors = {
-  email?: string;
-  username?: string;
-  password?: string;
-  agreeToTerms?: string;
-};
-
-// ==== LOGIN FORM TYPES ====
-export interface LoginFormData {
   email: string;
   password: string;
 }
 
-// ==== GROCERY LIST TYPES ====
+
+// ==== TYPES ====
 export interface GroceryList {
   id?: number;
-  name: string;
-  items: Item[];
-  userId: number;
+  listName: string;
+  items?: Item[];
 }
 
-// ==== ITEM TYPES ====
-export interface Item {
+export interface Refrigerator {
   id: number;
-  name: string;
+  fridgeName: string;
+  items?: Item[];
+}
+
+export interface Item {
+  id?: number;
+  itemName: string;
   quantity: number;
   expirationDate: string;
 }
+
+export interface Recipe {
+  id: number;
+  prompt: string;
+  response: string;
+}
+

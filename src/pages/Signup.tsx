@@ -1,138 +1,254 @@
-import { type JSX, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import SignupForm from "../components/SignupForm";
-import type { SignupFormData, SignupFormErrors } from "../types";
-import { getAllUsers, findUserByEmail } from "../data/data";
-import {NavLink} from "react-router-dom";
+// Sign up page that collects email and password, validates inputs, and sends a POST request to the backend to create a new user.
+
+import { type JSX, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Button,
+  Card,
+  Field,
+  Input,
+  Stack,
+  Text,
+  Heading,
+  Box,
+  Flex,
+} from "@chakra-ui/react";
+import { API_BASE_URL } from "../config";
+
+interface FormData {
+  email: string;
+  password: string;
+}
+
+interface SignupFormErrors {
+  email: string;
+  password: string;
+}
 
 const Signup = (): JSX.Element => {
-  // ==== CONTEXT ====
-  const { signup } = useContext(AuthContext); // only need signup here?
-
-  // ==== STATE ====
-  const [formData, setFormData] = useState<SignupFormData>({
-    username: "",
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
-    agreeToTerms: false,
   });
 
-  const [errors, setErrors] = useState<SignupFormErrors>({});
+  const [fieldErrors, setFieldErrors] = useState<SignupFormErrors>({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState<string>("");
 
   const [signupSuccess, setSignupSuccess] = useState(false);
 
-  // ==== FUNCTIONS AND HANDLERS ====
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { email, password } = formData;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear feedback on new input
+    if (error) setError("");
+    if (signupSuccess) setSignupSuccess(false);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const validateField = (name: string, value: string | boolean): string => {
+  const validateField = (name: string, value: string): string => {
     let error = "";
 
-    if (name === "username" && typeof value === "string") {
-      if (!value.trim()) error = "Username is required.";
-      else if (value.trim().length < 5)
-        error = "Username must be at least 5 characters.";
-    } else if (name === "email" && typeof value === "string") {
+    if (name === "email" && typeof value === "string") {
       if (!value.trim()) error = "Email is required.";
       else if (!/\S+@\S+\.\S+/.test(value))
         error = "Email must be valid (contain @ and .)";
+      // 	\S+ = one or more non-whitespace characters
+      // @ = must contain an @ symbol
+      // . = must contain a dot after the @
+      // .test(value) returns true if the value matches, otherwise false.
     } else if (name === "password" && typeof value === "string") {
       if (!value.trim()) error = "Password is required.";
       else if (value.length < 8 || !/[A-Z]/.test(value) || !/\d/.test(value))
         error =
           "Password must be at least 8 characters, contain an uppercase letter and a number.";
-    } else if (name === "agreeToTerms" && value === false) {
-      error = "You must agree to the terms.";
     }
-
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    setFieldErrors((prev) => ({ ...prev, [name]: error }));
     return error;
   };
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    // event.target is the <input> element that lost focus.
     const { name, value } = event.target;
 
-    const typedName = name as keyof SignupFormErrors; // tells typescript that the name is a key of UserSignupFormErrors
-
+    const typedName = name as keyof SignupFormErrors; // tells typescript that the name is a key of FormData
     const errorMessage = validateField(typedName, value);
 
-    setErrors((prev) => ({
+    setFieldErrors((prev) => ({
       ...prev,
-      [typedName]: errorMessage, // use typedName vs. name because we want to use the typedName (which is a key of UserSignupFormErrors) for Typescript
+      [typedName]: errorMessage, // use typedName vs. name because we want to use the typedName (which is a key of SignupFormErrors) for Typescript
     }));
+
+    // early exit if there's an error
+    if (errorMessage) {
+      return;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const newErrors: SignupFormErrors = {
-      username: "",
+    setFieldErrors({
       email: "",
       password: "",
-      agreeToTerms: "",
-    };
-
-    // set variable with let to true to start and set to false if it doesn't pass validation
-    let isValid = true;
+    });
 
     for (const name in formData) {
-      const typedName = name as keyof SignupFormErrors; // tells typescript that the name is a key of UserSignupFormData
-
+      const typedName = name as keyof SignupFormErrors;
       const error = validateField(typedName, formData[typedName]);
-
-      newErrors[typedName] = error;
-      if (error) {
-        isValid = false;
-      }
+      fieldErrors[typedName] = error;
     }
+    // need loading states to prevent double actions otherwise user could submit multiple times and create duplicate post requests (users in this case)
+    setIsLoading(true);
+    await signup();
+    setIsLoading(false);
+  };
 
-    setErrors(newErrors);
-
-    // signup comes from AuthContext
-    if (isValid) {
-      signup({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        agreeToTerms: formData.agreeToTerms
+  const signup = async () => {
+    console.log("signing up");
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      // check if user was added to db
-      console.log("Users: ", getAllUsers());
-
-      const userWasAdded = findUserByEmail(formData.email);
-      if (userWasAdded) {
-        setSignupSuccess(true);
-        // reset form
-        setFormData({
-          username: "",
-          email: "",
-          password: "",
-          agreeToTerms: false,
-        });
+      if (!response.ok) {
+        throw new Error("Account not created");
+      }
+      const data = await response.json();
+      console.log(data);
+      setSignupSuccess(true);
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error instanceof Error) {
+        setError(
+          "Signup failed. Please try again. Error message: " + error.message
+        );
+      } else {
+        setError("Signup failed. Please try again.");
       }
     }
   };
 
   return (
     <>
-      <h1>Signup</h1>
-      <SignupForm
-        formData={formData}
-        errors={errors}
-        onInputChange={handleInputChange}
-        onSubmit={handleSubmit}
-        onBlur={handleBlur}
-      />
+      <Flex
+        as="main"
+        direction="column"
+        align="center"
+        minH="100vh"
+        p={8}
+        textAlign="center"
+      >
+        <Heading size="2xl">Sign up</Heading>
 
-      {signupSuccess && (
-        <p>
-          Account successfully created!
-          <NavLink to="/login">Login now</NavLink>
-        </p>
-      )}
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minH="50vh"
+          p={4}
+        >
+          <form onSubmit={handleSubmit}>
+            <Card.Root maxW="sm" w="full" p={6}>
+              <Card.Header>
+                <Heading size="md">Join the Fridgy fam!</Heading>
+                <Text fontSize="sm" color="gray.500">
+                  Sign up with your email and password below
+                </Text>
+              </Card.Header>
+
+              <Card.Body>
+                <Stack gap={4}>
+                  <Field.Root>
+                    <Field.Label>Email</Field.Label>
+                    <Input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      required
+                    />
+                    {fieldErrors.email && (
+                      <Text color="red.500" fontSize="sm">
+                        {fieldErrors.email}
+                      </Text>
+                    )}
+                  </Field.Root>
+
+                  <Field.Root>
+                    <Field.Label>Password</Field.Label>
+                    <Input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      required
+                    />
+                    {fieldErrors.password && (
+                      <Text color="red.500" fontSize="sm">
+                        {fieldErrors.password}
+                      </Text>
+                    )}
+                  </Field.Root>
+                </Stack>
+              </Card.Body>
+
+              <Card.Footer
+                flexDirection="column"
+                alignItems="flex-start"
+                gap={3}
+              >
+                <Button
+                  type="submit"
+                  variant="solid"
+                  w="full"
+                  disabled={isLoading}
+                  // submit button is disabled if isLoading is true
+                >
+                  Submit
+                </Button>
+                <Text fontSize="sm">
+                  Already have an account?{" "}
+                  <Link to="/auth/login" style={{ color: "#3182ce" }}>
+                    Login
+                  </Link>
+                </Text>
+              </Card.Footer>
+            </Card.Root>
+          </form>
+        </Box>
+
+        {error && (
+          <Text color="red.500" fontSize="sm">
+            {error}
+          </Text>
+        )}
+
+        {signupSuccess && (
+          <Text mt={4} color="green.500">
+            Account successfully created!{" "}
+            <Link to="/auth/login" style={{ color: "#3182ce" }}>
+              Login now
+            </Link>
+          </Text>
+        )}
+      </Flex>
     </>
   );
 };
