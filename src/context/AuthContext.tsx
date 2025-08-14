@@ -8,7 +8,7 @@ export interface AuthContextType {
   setIsAuthenticated: (isAuth: boolean) => void;
   isLoading: boolean;
   authData: AuthResponse | null;
-  setAuthData: (authData: AuthResponse) => void;
+  setAuthData: (authData: AuthResponse | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({

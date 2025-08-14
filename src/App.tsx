@@ -59,7 +59,7 @@ const App = () => {
       }
       // if you have something in the useEffect it should be a dependency
     }
-  }, [isLoading, isAuthenticated, location]);
+  }, [isLoading, isAuthenticated, location, navigate]);
 
   if (isLoading) {
     return<Text>isLoading...</Text>

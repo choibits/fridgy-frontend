@@ -14,7 +14,7 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
 - Refrigerator
   - View fridge items per fridge
   - Delete items when used up
-- [Pollinations API](https://pollinations.ai) integration for recipe suggestions based on existing fridge items
+- [Pollinations API](https://pollinations.ai) integration for AI recipe suggestions based on existing fridge items
 
 ## Frontend Technologies
 - **React**: Used for building the UI with components like Header, GroceryListDetails, RefrigeratorDetails
@@ -46,10 +46,10 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
   - `DELETE /grocerylists/{listId}`: Delete a grocery list
 
 ### GroceryListDetails page
-- `GET /grocerylists/{listId}`: Get details of a grocery list
+- `GET /grocerylists/{listId}`: Get a grocery list by ID
 - `POST /grocerylists/{listId}/items`: Create an item in the grocery list
 - `DELETE /grocerylists/{listId}/items/{itemId}`: Delete an item from the grocery list
-- `PUT /grocerylists/items/{editingItemId}`: Update an item in the grocery list
+- `PUT /grocerylists/{listId}/items/{editingItemId}`: Update an item in the grocery list
 
 **Add to refrigerator section of GroceryListDetails page**
 - `GET /refrigerators`: Get all refrigerators to display in dropdown
@@ -59,6 +59,11 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
   - `GET /grocerylists/users/{userId}`: Get all refrigerators for a user
   - `POST /refrigerators`: Create a new refrigerator
   - `DELETE /refrigerators/{listId}`: Delete a refrigerator
+
+### Refrigerator Details page
+- `GET /refrigerators/{fridgeId}`: Get a refrigerator by ID
+- `DELETE refrigerators/{fridgeId}/items/{itemId}`: Delete an item from the refrigerator
+- `PUT /refrigerators/{fridgeId}/items/{editingItemId}`: Update an item in the refrigerator
 
 
 
