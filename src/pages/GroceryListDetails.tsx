@@ -27,7 +27,7 @@ interface formData {
   expirationDate: string;
 }
 
-const GroceryList = (): JSX.Element => {
+const GroceryListDetails = (): JSX.Element => {
   const [formData, setFormData] = useState<formData>({
     itemName: "",
     quantity: null,
@@ -619,4 +619,4 @@ const GroceryList = (): JSX.Element => {
   );
 };
 
-export default GroceryList;
+export default GroceryListDetails;
