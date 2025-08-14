@@ -55,6 +55,11 @@ Fridgy is a web app for managing groceries and refrigerator items. The goal of t
 - `GET /refrigerators`: Get all refrigerators to display in dropdown
 - `POST /refrigerators/{selectedFridgeId}/items`: Add items to fridge from checked items on the grocery list
 
+### Refrigerators page
+  - `GET /grocerylists/users/{userId}`: Get all refrigerators for a user
+  - `POST /refrigerators`: Create a new refrigerator
+  - `DELETE /refrigerators/{listId}`: Delete a refrigerator
+
 
 
 

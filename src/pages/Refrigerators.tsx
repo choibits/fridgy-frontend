@@ -1,4 +1,4 @@
-import { type JSX, useState, useContext, useEffect } from "react";
+import { type JSX, useState, useContext, useEffect, useCallback } from "react";
 import {
   Stack,
   Heading,
@@ -27,11 +27,31 @@ const Refrigerators = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { authData } = useContext(AuthContext);
 
+  const getRefrigerators = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/refrigerators/users/${authData?.id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authData?.token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data?.message || "Failed to fetch refrigerators.");
+        return;
+      }
+      setRefrigerators(data);
+    } catch (err) {
+      console.error("Error fetching refrigerators:", err);
+      setError("Something went wrong.");
+    }
+  }, [authData?.token, authData?.id]);
+
   useEffect(() => {
     if (authData?.token) {
       getRefrigerators();
     }
-  }, [authData]);
+  }, [authData, getRefrigerators]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -69,26 +89,6 @@ const Refrigerators = (): JSX.Element => {
       await getRefrigerators();
     } catch (err) {
       console.error("Error creating refrigerator:", err);
-      setError("Something went wrong.");
-    }
-  };
-
-  const getRefrigerators = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/refrigerators`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authData?.token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data?.message || "Failed to fetch refrigerators.");
-        return;
-      }
-      setRefrigerators(data);
-    } catch (err) {
-      console.error("Error fetching refrigerators:", err);
       setError("Something went wrong.");
     }
   };

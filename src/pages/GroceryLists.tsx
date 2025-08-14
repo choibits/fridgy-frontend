@@ -41,7 +41,6 @@ const GroceryLists = (): JSX.Element => {
         {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${authData?.token}`,
           },
         }
