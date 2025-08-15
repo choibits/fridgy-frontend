@@ -3,13 +3,12 @@ import {
   Box,
   Heading,
   Text,
-  Table,
   Button,
-  Flex,
-  Link,
+  Flex
 } from "@chakra-ui/react";
 import { AuthContext } from "../context/AuthContext";
 import { API_BASE_URL } from "../config";
+// Table and Link imports for chakra
 
 interface Profile {
   id: string; // UUID
@@ -77,6 +76,11 @@ const Profile = () => {
           minW="50vw"
           p={4}
         >
+          {loading && (
+            <Text fontSize="sm">
+              Loading profile...
+            </Text>
+          )}
           {/* TODO: Come back and change this to profile info, also need an "if" no profile handling and error handling */}
 
           {/* <Table.Root size="sm" interactive>
@@ -112,6 +116,12 @@ const Profile = () => {
                   </Table.Body>
                 </Table.Root> */}
         </Box>
+
+        {error && (
+          <Text color="red.500" fontSize="sm">
+            {error}
+          </Text>
+        )}
       </Flex>
     </>
   );
